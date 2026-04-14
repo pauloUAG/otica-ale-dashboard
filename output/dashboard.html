@@ -1,0 +1,5459 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ótica Alê Eyewear — Dashboard Semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #FAFAF7;
+    --surface:    #FFFFFF;
+    --border:     #E8E6DF;
+    --border-2:   #D5D2CA;
+    --text-1:     #1A1916;
+    --text-2:     #5A5751;
+    --text-3:     #9B9690;
+    --teal:       #2B8C7E;
+    --teal-light: #EBF5F3;
+    --teal-mid:   #C2DED9;
+    --red:        #C8503C;
+    --red-light:  #FBF0EE;
+    --gold:       #B8860B;
+    --gold-light: #FDF6E3;
+    --radius:     14px;
+    --radius-sm:  8px;
+    --shadow:     0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+    --shadow-md:  0 2px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text-1);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Typography ── */
+  .font-display { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Layout ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-brand { display: flex; flex-direction: column; gap: 2px; }
+  .brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    color: var(--text-1);
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 400;
+    letter-spacing: .3px;
+  }
+  .header-period {
+    font-size: 13px;
+    color: var(--text-2);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-weight: 500;
+  }
+
+  /* ── Main Content ── */
+  .main { padding: 32px 0 64px; }
+
+  /* ── Section Label ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+
+  /* ── KPI Cards ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -.5px;
+    line-height: 1.2;
+  }
+  .kpi-value.accent { color: var(--teal); }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  /* ── City Selector ── */
+  .city-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .city-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: all .15s ease;
+    font-family: inherit;
+    min-width: 160px;
+    flex: 1;
+  }
+  .city-btn:hover {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .city-btn.active {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    box-shadow: 0 0 0 2px var(--teal-mid);
+  }
+  .city-btn-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: .2px;
+  }
+  .city-btn.active .city-btn-name { color: var(--teal); }
+  .city-btn-stats {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .city-btn-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-2);
+    font-size: 11px;
+  }
+
+  /* ── City Detail ── */
+  .city-detail { display: none; }
+  .city-detail.visible { display: block; }
+
+  /* ── Metrics Grid ── */
+  .metrics-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .metrics-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 768px) {
+    .metrics-grid-3, .metrics-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .metric-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .metric-value.green { color: var(--teal); }
+  .metric-value.red   { color: var(--red); }
+  .metric-value.gold  { color: var(--gold); }
+
+  /* ── Chart & Table Layout ── */
+  .chart-table-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 16px;
+    margin-bottom: 28px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .chart-table-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+  }
+  .card-body { padding: 20px; }
+
+  /* ── Offers Table ── */
+  .offers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .offers-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .offers-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .offers-table tr:last-child td { border-bottom: none; }
+  .offers-table td.mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .offers-table tr:hover td { background: var(--bg); }
+
+  /* ── Offer Badge ── */
+  .offer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+
+  /* ── Health Badge ── */
+  .health-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .health-otimo  { background: var(--teal-light); color: var(--teal); }
+  .health-ok     { background: var(--gold-light); color: var(--gold); }
+  .health-caro   { background: var(--red-light); color: var(--red); }
+
+  /* ── Top Creatives ── */
+  .creatives-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 16px;
+  }
+  .creatives-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 1200px) { .creatives-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px)  { .creatives-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px)  { .creatives-grid { grid-template-columns: 1fr; } }
+
+  .creative-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .15s, transform .15s;
+  }
+  .creative-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    aspect-ratio: 9/16;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background .15s;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    background: var(--teal-light);
+    border-color: var(--teal);
+  }
+  .drop-zone.has-img { background: #000; }
+  .drop-zone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+  .drop-zone-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .drop-zone.has-img .drop-zone-hint { display: none; }
+  .drop-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-3);
+    font-size: 16px;
+  }
+  .drop-text { font-size: 11px; color: var(--text-3); text-align: center; }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Rank badge */
+  .rank-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 26px;
+    height: 26px;
+    background: rgba(0,0,0,.65);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    z-index: 2;
+  }
+  .rank-1 { background: rgba(184,134,11,.9); }
+  .rank-2 { background: rgba(100,116,139,.9); }
+  .rank-3 { background: rgba(146,64,14,.85); }
+
+  /* Creative card body */
+  .creative-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .creative-hook {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-1);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .creative-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .creative-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .creative-metric-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .creative-metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .creative-metric-value.green { color: var(--teal); }
+  .creative-metric-value.red   { color: var(--red); }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--text-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     Header
+══════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="container header-inner">
+    <div class="header-brand">
+      <span class="brand-name">Ótica Alê <span class="font-display">Eyewear</span></span>
+      <span class="brand-sub">Dashboard Semanal · Meta Ads</span>
+    </div>
+    <span class="header-period" id="period-label">Carregando...</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     Main
+══════════════════════════════════════════════════ -->
+<main class="main">
+  <div class="container">
+
+    <!-- KPIs Gerais -->
+    <div class="section-label">Visão geral da semana</div>
+    <div class="kpi-grid" id="kpi-grid">
+      <!-- Injetado pelo JS -->
+    </div>
+
+    <!-- Seletor de cidades -->
+    <div class="section-label">Desempenho por cidade</div>
+    <div class="city-selector" id="city-selector">
+      <!-- Injetado pelo JS -->
+    </div>
+
+    <!-- Detalhes da cidade selecionada -->
+    <div id="city-detail-container">
+      <!-- Injetado pelo JS -->
+    </div>
+
+  </div><!-- /container -->
+</main>
+
+<!-- ══════════════════════════════════════════════════
+     Footer
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="container footer">
+    <span>Ótica Alê Eyewear · Relatório gerado em <span id="generated-at">—</span></span>
+    <span>Meta Marketing API · <span id="api-period">—</span></span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     Data injected by generate_dashboard.py
+══════════════════════════════════════════════════ -->
+<script>
+const DASHBOARD_DATA = {
+  "period_label": "01 jan — 13 abr 2026",
+  "period": {
+    "start": "2026-01-01",
+    "end": "2026-04-13"
+  },
+  "generated_at": "2026-04-13T23:37:53.975931",
+  "totals": {
+    "spend": 38957.62,
+    "conversations": 6452,
+    "cpa": 6.04,
+    "reach": 1412921,
+    "impressions": 3518619,
+    "clicks": 35085,
+    "profile_visits": 592548,
+    "ads_count": 199,
+    "active_ads": 199
+  },
+  "cities": [
+    {
+      "city": "BELÉM",
+      "spend": 15712.740000000002,
+      "conversations": 2896,
+      "clicks": 14753,
+      "reach": 413698,
+      "impressions": 1030074,
+      "profile_visits": 193393,
+      "ads": [
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - NUNCA FEZ ISSO",
+          "ad_id": "120238458236630661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 148.28,
+          "conversations": 32,
+          "cpa": 4.63,
+          "clicks": 133,
+          "ctr": 0.0184,
+          "reach": 4489,
+          "impressions": 7239,
+          "profile_visits": 1199
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238458236640661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 660.99,
+          "conversations": 116,
+          "cpa": 5.7,
+          "clicks": 671,
+          "ctr": 0.0137,
+          "reach": 30981,
+          "impressions": 49092,
+          "profile_visits": 11124
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - DOIS ÓCULOS",
+          "ad_id": "120239935999500661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 37.61,
+          "conversations": 13,
+          "cpa": 2.89,
+          "clicks": 42,
+          "ctr": 0.0246,
+          "reach": 1394,
+          "impressions": 1706,
+          "profile_visits": 389
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - CANSOU",
+          "ad_id": "120239935999510661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 32.78,
+          "conversations": 1,
+          "cpa": 32.78,
+          "clicks": 19,
+          "ctr": 0.0125,
+          "reach": 1266,
+          "impressions": 1514,
+          "profile_visits": 261
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - SER CARO",
+          "ad_id": "120239935999520661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 35.59,
+          "conversations": 5,
+          "cpa": 7.12,
+          "clicks": 23,
+          "ctr": 0.0179,
+          "reach": 1114,
+          "impressions": 1285,
+          "profile_visits": 303
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - GOLPE",
+          "ad_id": "120239936273200661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 36.25,
+          "conversations": 4,
+          "cpa": 9.06,
+          "clicks": 27,
+          "ctr": 0.0127,
+          "reach": 1621,
+          "impressions": 2118,
+          "profile_visits": 341
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - ESSA OFERTA",
+          "ad_id": "120239936273210661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 68.86,
+          "conversations": 8,
+          "cpa": 8.61,
+          "clicks": 44,
+          "ctr": 0.9136,
+          "reach": 3820,
+          "impressions": 4816,
+          "profile_visits": 716
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - POR UM REAL",
+          "ad_id": "120239936273220661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 46.02,
+          "conversations": 5,
+          "cpa": 9.2,
+          "clicks": 21,
+          "ctr": 0.8838,
+          "reach": 1898,
+          "impressions": 2376,
+          "profile_visits": 405
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - ESSA ARMAÇÃO",
+          "ad_id": "120239936273230661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 91.46,
+          "conversations": 13,
+          "cpa": 7.04,
+          "clicks": 73,
+          "ctr": 0.0122,
+          "reach": 4324,
+          "impressions": 5983,
+          "profile_visits": 1015
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240081021500661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 13.15,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 9,
+          "ctr": 0.0107,
+          "reach": 743,
+          "impressions": 843,
+          "profile_visits": 113
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - NUNCA FEZ ISSO",
+          "ad_id": "120240085213620661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 122.31,
+          "conversations": 30,
+          "cpa": 4.08,
+          "clicks": 154,
+          "ctr": 0.0256,
+          "reach": 4276,
+          "impressions": 6007,
+          "profile_visits": 1184
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240085213630661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 4411.55,
+          "conversations": 780,
+          "cpa": 5.66,
+          "clicks": 4154,
+          "ctr": 0.0186,
+          "reach": 96289,
+          "impressions": 222829,
+          "profile_visits": 54596
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - SER CARO",
+          "ad_id": "120240085254540661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 3370.26,
+          "conversations": 552,
+          "cpa": 6.11,
+          "clicks": 2556,
+          "ctr": 0.0153,
+          "reach": 55080,
+          "impressions": 167284,
+          "profile_visits": 33519
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - CANSOU",
+          "ad_id": "120240085254580661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 254.94,
+          "conversations": 20,
+          "cpa": 12.75,
+          "clicks": 108,
+          "ctr": 0.0105,
+          "reach": 6295,
+          "impressions": 10266,
+          "profile_visits": 1912
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - ESSA ARMAÇÃO",
+          "ad_id": "120240085585370661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1519.69,
+          "conversations": 211,
+          "cpa": 7.2,
+          "clicks": 1129,
+          "ctr": 0.0126,
+          "reach": 39352,
+          "impressions": 89460,
+          "profile_visits": 16327
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA - BELÉM",
+          "ad_id": "120240085912880661",
+          "city": "BELÉM",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 959.47,
+          "conversations": 381,
+          "cpa": 2.52,
+          "clicks": 1371,
+          "ctr": 0.0218,
+          "reach": 20375,
+          "impressions": 62813,
+          "profile_visits": 13664
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - MUITA GENTE",
+          "ad_id": "120240631639110661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 78.72,
+          "conversations": 8,
+          "cpa": 9.84,
+          "clicks": 56,
+          "ctr": 0.0144,
+          "reach": 2764,
+          "impressions": 3885,
+          "profile_visits": 686
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - MUITA GENTE",
+          "ad_id": "120240631662350661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 1654.48,
+          "conversations": 311,
+          "cpa": 5.32,
+          "clicks": 1589,
+          "ctr": 0.0162,
+          "reach": 42845,
+          "impressions": 98137,
+          "profile_visits": 15971
+        },
+        {
+          "name": "Ad 01 - REELS - EXAME DE VISTA - BELÉM",
+          "ad_id": "120240631952700661",
+          "city": "BELÉM",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 127.22,
+          "conversations": 31,
+          "cpa": 4.1,
+          "clicks": 185,
+          "ctr": 0.0199,
+          "reach": 4784,
+          "impressions": 9300,
+          "profile_visits": 1615
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - SE ESTE VÍDEO",
+          "ad_id": "120241382653250661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "SE ESTE VÍDEO",
+          "status": "ATIVO",
+          "spend": 37.74,
+          "conversations": 6,
+          "cpa": 6.29,
+          "clicks": 27,
+          "ctr": 0.0155,
+          "reach": 1011,
+          "impressions": 1738,
+          "profile_visits": 342
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - NÃO É SORTE É OPORTUNIDADE",
+          "ad_id": "120241382653290661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "NÃO É SORTE",
+          "status": "ATIVO",
+          "spend": 804.9,
+          "conversations": 192,
+          "cpa": 4.19,
+          "clicks": 1114,
+          "ctr": 0.9557,
+          "reach": 33636,
+          "impressions": 116568,
+          "profile_visits": 14703
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - SE VOCÊ ESTÁ VENDO",
+          "ad_id": "120241382653300661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "SE VOCÊ ESTÁ VENDO",
+          "status": "ATIVO",
+          "spend": 315.52,
+          "conversations": 77,
+          "cpa": 4.1,
+          "clicks": 370,
+          "ctr": 0.0153,
+          "reach": 15205,
+          "impressions": 24240,
+          "profile_visits": 4171
+        },
+        {
+          "name": "DIA DA MULHER - BELÉM",
+          "ad_id": "120242067094130661",
+          "city": "BELÉM",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 41.1,
+          "conversations": 1,
+          "cpa": 41.1,
+          "clicks": 8,
+          "ctr": 0.4437,
+          "reach": 271,
+          "impressions": 1803,
+          "profile_visits": 146
+        },
+        {
+          "name": "Ad - 00 - REELS - DIA DA MULHER - BELÉM - DIA DA MULHER",
+          "ad_id": "120242132049420661",
+          "city": "BELÉM",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 64.09,
+          "conversations": 6,
+          "cpa": 10.68,
+          "clicks": 45,
+          "ctr": 0.0126,
+          "reach": 2202,
+          "impressions": 3566,
+          "profile_visits": 631
+        },
+        {
+          "name": "Ad 03 - REELS - AQUECIMENTO - BELÉM",
+          "ad_id": "120243100149390661",
+          "city": "BELÉM",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 7.45,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 5,
+          "ctr": 0.1659,
+          "reach": 1628,
+          "impressions": 3014,
+          "profile_visits": 219
+        },
+        {
+          "name": "Ad 02 - REELS - AQUECIMENTO - BELÉM",
+          "ad_id": "120243100149400661",
+          "city": "BELÉM",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 25.11,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 31,
+          "ctr": 0.3337,
+          "reach": 3066,
+          "impressions": 9289,
+          "profile_visits": 623
+        },
+        {
+          "name": "Ad 00 - REELS - AQUECIMENTO - BELÉM",
+          "ad_id": "120243100149410661",
+          "city": "BELÉM",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 165.21,
+          "conversations": 1,
+          "cpa": 165.21,
+          "clicks": 125,
+          "ctr": 0.1941,
+          "reach": 6737,
+          "impressions": 64406,
+          "profile_visits": 3603
+        },
+        {
+          "name": "Ad 01 - REELS - AQUECIMENTO - BELÉM",
+          "ad_id": "120243100149420661",
+          "city": "BELÉM",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 7.2,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 5,
+          "ctr": 0.1759,
+          "reach": 1588,
+          "impressions": 2842,
+          "profile_visits": 179
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - BELÉM —  INFLUENCER",
+          "ad_id": "120243468918770661",
+          "city": "BELÉM",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 223.62,
+          "conversations": 45,
+          "cpa": 4.97,
+          "clicks": 274,
+          "ctr": 0.013,
+          "reach": 10112,
+          "impressions": 21115,
+          "profile_visits": 4215
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - BELÉM —  SERÁ",
+          "ad_id": "120243469517520661",
+          "city": "BELÉM",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 188.65,
+          "conversations": 28,
+          "cpa": 6.74,
+          "clicks": 264,
+          "ctr": 0.0107,
+          "reach": 7345,
+          "impressions": 24668,
+          "profile_visits": 7207
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - BELÉM — SEU ÓCULOS VALE DOIS",
+          "ad_id": "120243913053330661",
+          "city": "BELÉM",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 3.12,
+          "conversations": 2,
+          "cpa": 1.56,
+          "clicks": 5,
+          "ctr": 0.0248,
+          "reach": 194,
+          "impressions": 202,
+          "profile_visits": 42
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - BELÉM — OLHA SÓ ISSO",
+          "ad_id": "120243913074190661",
+          "city": "BELÉM",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 115.64,
+          "conversations": 13,
+          "cpa": 8.9,
+          "clicks": 79,
+          "ctr": 0.012,
+          "reach": 4581,
+          "impressions": 6600,
+          "profile_visits": 1205
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - BELÉM — RESULTADO EM DOBRO",
+          "ad_id": "120243913075040661",
+          "city": "BELÉM",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 43.76,
+          "conversations": 4,
+          "cpa": 10.94,
+          "clicks": 37,
+          "ctr": 0.0121,
+          "reach": 2412,
+          "impressions": 3070,
+          "profile_visits": 767
+        }
+      ],
+      "offers": {
+        "R$ 1,00": {
+          "offer": "R$ 1,00",
+          "spend": 10009.92,
+          "conversations": 1793,
+          "clicks": 9571,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.58
+        },
+        "MULTIFOCAL": {
+          "offer": "MULTIFOCAL",
+          "spend": 3731.1800000000003,
+          "conversations": 591,
+          "clicks": 2748,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 6.31
+        },
+        "EXAME DE VISTA": {
+          "offer": "EXAME DE VISTA",
+          "spend": 1086.69,
+          "conversations": 412,
+          "clicks": 1556,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 2.64
+        },
+        "DIA DA MULHER": {
+          "offer": "DIA DA MULHER",
+          "spend": 105.19,
+          "conversations": 7,
+          "clicks": 53,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 15.03
+        },
+        "OUTRO": {
+          "offer": "OUTRO",
+          "spend": 204.97,
+          "conversations": 1,
+          "clicks": 166,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 204.97
+        },
+        "EM DOBRO": {
+          "offer": "EM DOBRO",
+          "spend": 574.79,
+          "conversations": 92,
+          "clicks": 659,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 6.25
+        }
+      },
+      "cpa": 5.43,
+      "active_ads": 33,
+      "top_ads": [
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240085213630661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 4411.55,
+          "conversations": 780,
+          "cpa": 5.66,
+          "clicks": 4154,
+          "ctr": 0.0186,
+          "reach": 96289,
+          "impressions": 222829,
+          "profile_visits": 54596
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - BELÉM - SER CARO",
+          "ad_id": "120240085254540661",
+          "city": "BELÉM",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 3370.26,
+          "conversations": 552,
+          "cpa": 6.11,
+          "clicks": 2556,
+          "ctr": 0.0153,
+          "reach": 55080,
+          "impressions": 167284,
+          "profile_visits": 33519
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA - BELÉM",
+          "ad_id": "120240085912880661",
+          "city": "BELÉM",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 959.47,
+          "conversations": 381,
+          "cpa": 2.52,
+          "clicks": 1371,
+          "ctr": 0.0218,
+          "reach": 20375,
+          "impressions": 62813,
+          "profile_visits": 13664
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - MUITA GENTE",
+          "ad_id": "120240631662350661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 1654.48,
+          "conversations": 311,
+          "cpa": 5.32,
+          "clicks": 1589,
+          "ctr": 0.0162,
+          "reach": 42845,
+          "impressions": 98137,
+          "profile_visits": 15971
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - BELÉM - ESSA ARMAÇÃO",
+          "ad_id": "120240085585370661",
+          "city": "BELÉM",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1519.69,
+          "conversations": 211,
+          "cpa": 7.2,
+          "clicks": 1129,
+          "ctr": 0.0126,
+          "reach": 39352,
+          "impressions": 89460,
+          "profile_visits": 16327
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "R$ 1,00",
+          "spend": 10009.92,
+          "conversations": 1793,
+          "clicks": 9571,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.58
+        },
+        {
+          "offer": "MULTIFOCAL",
+          "spend": 3731.1800000000003,
+          "conversations": 591,
+          "clicks": 2748,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 6.31
+        },
+        {
+          "offer": "EXAME DE VISTA",
+          "spend": 1086.69,
+          "conversations": 412,
+          "clicks": 1556,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 2.64
+        },
+        {
+          "offer": "EM DOBRO",
+          "spend": 574.79,
+          "conversations": 92,
+          "clicks": 659,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 6.25
+        },
+        {
+          "offer": "DIA DA MULHER",
+          "spend": 105.19,
+          "conversations": 7,
+          "clicks": 53,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 15.03
+        },
+        {
+          "offer": "OUTRO",
+          "spend": 204.97,
+          "conversations": 1,
+          "clicks": 166,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 204.97
+        }
+      ]
+    },
+    {
+      "city": "ANANINDEUA",
+      "spend": 9596.720000000001,
+      "conversations": 1565,
+      "clicks": 8301,
+      "reach": 307352,
+      "impressions": 713464,
+      "profile_visits": 128789,
+      "ads": [
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238455945570661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 605.21,
+          "conversations": 126,
+          "cpa": 4.8,
+          "clicks": 688,
+          "ctr": 0.0137,
+          "reach": 30734,
+          "impressions": 50064,
+          "profile_visits": 11072
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238455945590661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 103.8,
+          "conversations": 12,
+          "cpa": 8.65,
+          "clicks": 109,
+          "ctr": 0.0127,
+          "reach": 5165,
+          "impressions": 8607,
+          "profile_visits": 1001
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - ESSA OFERTA",
+          "ad_id": "120239925551530661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 60.4,
+          "conversations": 1,
+          "cpa": 60.4,
+          "clicks": 34,
+          "ctr": 0.6916,
+          "reach": 3794,
+          "impressions": 4916,
+          "profile_visits": 639
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - GOLPE",
+          "ad_id": "120239925551540661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 44.15,
+          "conversations": 2,
+          "cpa": 22.07,
+          "clicks": 31,
+          "ctr": 0.0114,
+          "reach": 1857,
+          "impressions": 2724,
+          "profile_visits": 382
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - POR UM REAL",
+          "ad_id": "120239925551550661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 54.56,
+          "conversations": 4,
+          "cpa": 13.64,
+          "clicks": 32,
+          "ctr": 0.9587,
+          "reach": 2554,
+          "impressions": 3338,
+          "profile_visits": 548
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - ESSA ARMAÇÃO",
+          "ad_id": "120239926115090661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 91.96,
+          "conversations": 14,
+          "cpa": 6.57,
+          "clicks": 83,
+          "ctr": 0.011,
+          "reach": 5599,
+          "impressions": 7523,
+          "profile_visits": 1264
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - SER CARO",
+          "ad_id": "120239935694430661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 39.59,
+          "conversations": 5,
+          "cpa": 7.92,
+          "clicks": 24,
+          "ctr": 0.0113,
+          "reach": 1865,
+          "impressions": 2128,
+          "profile_visits": 368
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - DOIS ÓCULOS",
+          "ad_id": "120239935694440661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 31.62,
+          "conversations": 6,
+          "cpa": 5.27,
+          "clicks": 29,
+          "ctr": 0.015,
+          "reach": 1615,
+          "impressions": 1935,
+          "profile_visits": 374
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - CANSOU",
+          "ad_id": "120239935694450661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 31.64,
+          "conversations": 2,
+          "cpa": 15.82,
+          "clicks": 16,
+          "ctr": 0.8864,
+          "reach": 1512,
+          "impressions": 1805,
+          "profile_visits": 294
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240081021510661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 88.63,
+          "conversations": 10,
+          "cpa": 8.86,
+          "clicks": 73,
+          "ctr": 0.0102,
+          "reach": 6425,
+          "impressions": 7123,
+          "profile_visits": 1678
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - ESSA ARMAÇÃO",
+          "ad_id": "120240081167570661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 37.43,
+          "conversations": 3,
+          "cpa": 12.48,
+          "clicks": 21,
+          "ctr": 0.9511,
+          "reach": 1984,
+          "impressions": 2208,
+          "profile_visits": 410
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - DOIS ÓCULOS",
+          "ad_id": "120240081243650661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 16.13,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 11,
+          "ctr": 0.0132,
+          "reach": 775,
+          "impressions": 832,
+          "profile_visits": 165
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - SER CARO",
+          "ad_id": "120240081243660661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 16.7,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 5,
+          "ctr": 0.7032,
+          "reach": 671,
+          "impressions": 711,
+          "profile_visits": 142
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240106430740661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1241.0,
+          "conversations": 186,
+          "cpa": 6.67,
+          "clicks": 1116,
+          "ctr": 0.0159,
+          "reach": 43538,
+          "impressions": 70297,
+          "profile_visits": 17070
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240106430750661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 203.26,
+          "conversations": 23,
+          "cpa": 8.84,
+          "clicks": 217,
+          "ctr": 0.0129,
+          "reach": 8088,
+          "impressions": 16861,
+          "profile_visits": 1930
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - ESSA ARMAÇÃO",
+          "ad_id": "120240106901520661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 551.62,
+          "conversations": 45,
+          "cpa": 12.26,
+          "clicks": 302,
+          "ctr": 0.9094,
+          "reach": 18125,
+          "impressions": 33210,
+          "profile_visits": 5521
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - DOIS ÓCULOS",
+          "ad_id": "120240107023680661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 1184.24,
+          "conversations": 160,
+          "cpa": 7.4,
+          "clicks": 855,
+          "ctr": 0.0125,
+          "reach": 23473,
+          "impressions": 68207,
+          "profile_visits": 13149
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - SER CARO",
+          "ad_id": "120240107023710661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 1744.04,
+          "conversations": 246,
+          "cpa": 7.09,
+          "clicks": 1133,
+          "ctr": 0.0118,
+          "reach": 34741,
+          "impressions": 96307,
+          "profile_visits": 17414
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - MUITA GENTE",
+          "ad_id": "120240631438650661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 728.36,
+          "conversations": 103,
+          "cpa": 7.07,
+          "clicks": 680,
+          "ctr": 0.011,
+          "reach": 23269,
+          "impressions": 61960,
+          "profile_visits": 8326
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240911837010661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1335.46,
+          "conversations": 392,
+          "cpa": 3.41,
+          "clicks": 1770,
+          "ctr": 0.0131,
+          "reach": 56218,
+          "impressions": 135038,
+          "profile_visits": 28261
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - OLHA QUE LINDO",
+          "ad_id": "120240911925410661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 11.67,
+          "conversations": 4,
+          "cpa": 2.92,
+          "clicks": 24,
+          "ctr": 0.0209,
+          "reach": 832,
+          "impressions": 1150,
+          "profile_visits": 249
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - MOEDA",
+          "ad_id": "120240912038030661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 2.15,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 8,
+          "ctr": 0.037,
+          "reach": 150,
+          "impressions": 216,
+          "profile_visits": 41
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO - ANANINDEUA - VOCÊ PRECISANDO",
+          "ad_id": "120241113651260661",
+          "city": "ANANINDEUA",
+          "offer": "LIGAÇÃO",
+          "hook": "VOCÊ PRECISANDO",
+          "status": "ATIVO",
+          "spend": 16.68,
+          "conversations": 5,
+          "cpa": 3.34,
+          "clicks": 37,
+          "ctr": 0.4262,
+          "reach": 596,
+          "impressions": 8681,
+          "profile_visits": 1181
+        },
+        {
+          "name": "Ad 00 - REELS - LIGAÇÃO - ANANINDEUA - ALERTA URGENTE",
+          "ad_id": "120241114926950661",
+          "city": "ANANINDEUA",
+          "offer": "LIGAÇÃO",
+          "hook": "ALERTA URGENTE",
+          "status": "ATIVO",
+          "spend": 890.19,
+          "conversations": 188,
+          "cpa": 4.74,
+          "clicks": 722,
+          "ctr": 0.0139,
+          "reach": 14728,
+          "impressions": 52123,
+          "profile_visits": 10982
+        },
+        {
+          "name": "DIA DA MULHER - ANANINDEUA",
+          "ad_id": "120242066938500661",
+          "city": "ANANINDEUA",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 0.85,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 4,
+          "impressions": 15,
+          "profile_visits": 1
+        },
+        {
+          "name": "Ad - 00 - REELS - DIA DA MULHER - ANANINDEUA - DIA DA MULHER",
+          "ad_id": "120242132114700661",
+          "city": "ANANINDEUA",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 62.57,
+          "conversations": 4,
+          "cpa": 15.64,
+          "clicks": 35,
+          "ctr": 0.8979,
+          "reach": 2199,
+          "impressions": 3898,
+          "profile_visits": 587
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - ANANINDEUA - PAGUE UM LEVE DOIS",
+          "ad_id": "120242336471620661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "PAGUE UM LEVE DOIS",
+          "status": "ATIVO",
+          "spend": 45.97,
+          "conversations": 2,
+          "cpa": 22.98,
+          "clicks": 10,
+          "ctr": 0.2933,
+          "reach": 2302,
+          "impressions": 3410,
+          "profile_visits": 501
+        },
+        {
+          "name": "Ad 01 - REELS - DOBRO - ANANINDEUA - PAGUE UM LEVE DOIS",
+          "ad_id": "120242440169240661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "PAGUE UM LEVE DOIS",
+          "status": "ATIVO",
+          "spend": 55.86,
+          "conversations": 4,
+          "cpa": 13.96,
+          "clicks": 43,
+          "ctr": 0.8461,
+          "reach": 2575,
+          "impressions": 5082,
+          "profile_visits": 498
+        },
+        {
+          "name": "Ad 02 - REELS - DOBRO - ANANINDEUA - PAGUE UM LEVE DOIS",
+          "ad_id": "120242440192410661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "PAGUE UM LEVE DOIS",
+          "status": "ATIVO",
+          "spend": 1.19,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 134,
+          "impressions": 143,
+          "profile_visits": 35
+        },
+        {
+          "name": "Ad 03 - REELS - AQUECIMENTO - ANANINDEUA",
+          "ad_id": "120243099615530661",
+          "city": "ANANINDEUA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 11.27,
+          "conversations": 1,
+          "cpa": 11.27,
+          "clicks": 12,
+          "ctr": 0.3709,
+          "reach": 1178,
+          "impressions": 3235,
+          "profile_visits": 266
+        },
+        {
+          "name": "Ad 00 - REELS - AQUECIMENTO - ANANINDEUA",
+          "ad_id": "120243099615540661",
+          "city": "ANANINDEUA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 10.6,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 4,
+          "ctr": 0.1385,
+          "reach": 1159,
+          "impressions": 2889,
+          "profile_visits": 236
+        },
+        {
+          "name": "Ad 01 - REELS - AQUECIMENTO - ANANINDEUA",
+          "ad_id": "120243099615550661",
+          "city": "ANANINDEUA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 174.26,
+          "conversations": 3,
+          "cpa": 58.09,
+          "clicks": 108,
+          "ctr": 0.2268,
+          "reach": 3824,
+          "impressions": 47628,
+          "profile_visits": 2725
+        },
+        {
+          "name": "Ad 02 - REELS - AQUECIMENTO - ANANINDEUA",
+          "ad_id": "120243099615560661",
+          "city": "ANANINDEUA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 7.17,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 5,
+          "ctr": 0.2458,
+          "reach": 926,
+          "impressions": 2034,
+          "profile_visits": 195
+        },
+        {
+          "name": "Ad 01 - REELS - DOBRO - ANANINDEUA - RESULTADO EM DOBRO",
+          "ad_id": "120243912680300661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 45.81,
+          "conversations": 8,
+          "cpa": 5.73,
+          "clicks": 36,
+          "ctr": 0.0101,
+          "reach": 2138,
+          "impressions": 3565,
+          "profile_visits": 719
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - ANANINDEUA - OLHA SÓ ISSO",
+          "ad_id": "120243912680310661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 3.67,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.3333,
+          "reach": 202,
+          "impressions": 300,
+          "profile_visits": 57
+        },
+        {
+          "name": "Ad 02 - REELS - DOBRO - ANANINDEUA - SEU ÓCULOS VALE DOIS",
+          "ad_id": "120243912828060661",
+          "city": "ANANINDEUA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 47.01,
+          "conversations": 6,
+          "cpa": 7.83,
+          "clicks": 27,
+          "ctr": 0.8179,
+          "reach": 2403,
+          "impressions": 3301,
+          "profile_visits": 508
+        }
+      ],
+      "offers": {
+        "R$ 1,00": {
+          "offer": "R$ 1,00",
+          "spend": 5159.66,
+          "conversations": 925,
+          "clicks": 5188,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.58
+        },
+        "MULTIFOCAL": {
+          "offer": "MULTIFOCAL",
+          "spend": 3063.96,
+          "conversations": 419,
+          "clicks": 2073,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 7.31
+        },
+        "LIGAÇÃO": {
+          "offer": "LIGAÇÃO",
+          "spend": 906.87,
+          "conversations": 193,
+          "clicks": 759,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 4.7
+        },
+        "DIA DA MULHER": {
+          "offer": "DIA DA MULHER",
+          "spend": 63.42,
+          "conversations": 4,
+          "clicks": 35,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 15.86
+        },
+        "EM DOBRO": {
+          "offer": "EM DOBRO",
+          "spend": 199.50999999999996,
+          "conversations": 20,
+          "clicks": 117,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 9.98
+        },
+        "OUTRO": {
+          "offer": "OUTRO",
+          "spend": 203.29999999999998,
+          "conversations": 4,
+          "clicks": 129,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 50.82
+        }
+      },
+      "cpa": 6.13,
+      "active_ads": 36,
+      "top_ads": [
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240911837010661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1335.46,
+          "conversations": 392,
+          "cpa": 3.41,
+          "clicks": 1770,
+          "ctr": 0.0131,
+          "reach": 56218,
+          "impressions": 135038,
+          "profile_visits": 28261
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - SER CARO",
+          "ad_id": "120240107023710661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 1744.04,
+          "conversations": 246,
+          "cpa": 7.09,
+          "clicks": 1133,
+          "ctr": 0.0118,
+          "reach": 34741,
+          "impressions": 96307,
+          "profile_visits": 17414
+        },
+        {
+          "name": "Ad 00 - REELS - LIGAÇÃO - ANANINDEUA - ALERTA URGENTE",
+          "ad_id": "120241114926950661",
+          "city": "ANANINDEUA",
+          "offer": "LIGAÇÃO",
+          "hook": "ALERTA URGENTE",
+          "status": "ATIVO",
+          "spend": 890.19,
+          "conversations": 188,
+          "cpa": 4.74,
+          "clicks": 722,
+          "ctr": 0.0139,
+          "reach": 14728,
+          "impressions": 52123,
+          "profile_visits": 10982
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240106430740661",
+          "city": "ANANINDEUA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 1241.0,
+          "conversations": 186,
+          "cpa": 6.67,
+          "clicks": 1116,
+          "ctr": 0.0159,
+          "reach": 43538,
+          "impressions": 70297,
+          "profile_visits": 17070
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - ANANINDEUA - DOIS ÓCULOS",
+          "ad_id": "120240107023680661",
+          "city": "ANANINDEUA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 1184.24,
+          "conversations": 160,
+          "cpa": 7.4,
+          "clicks": 855,
+          "ctr": 0.0125,
+          "reach": 23473,
+          "impressions": 68207,
+          "profile_visits": 13149
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "R$ 1,00",
+          "spend": 5159.66,
+          "conversations": 925,
+          "clicks": 5188,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.58
+        },
+        {
+          "offer": "MULTIFOCAL",
+          "spend": 3063.96,
+          "conversations": 419,
+          "clicks": 2073,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 7.31
+        },
+        {
+          "offer": "LIGAÇÃO",
+          "spend": 906.87,
+          "conversations": 193,
+          "clicks": 759,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 4.7
+        },
+        {
+          "offer": "EM DOBRO",
+          "spend": 199.50999999999996,
+          "conversations": 20,
+          "clicks": 117,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 9.98
+        },
+        {
+          "offer": "DIA DA MULHER",
+          "spend": 63.42,
+          "conversations": 4,
+          "clicks": 35,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 15.86
+        },
+        {
+          "offer": "OUTRO",
+          "spend": 203.29999999999998,
+          "conversations": 4,
+          "clicks": 129,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 50.82
+        }
+      ]
+    },
+    {
+      "city": "CASTANHAL",
+      "spend": 6404.740000000001,
+      "conversations": 1125,
+      "clicks": 5929,
+      "reach": 286865,
+      "impressions": 771611,
+      "profile_visits": 97914,
+      "ads": [
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120238414869280661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 75.53,
+          "conversations": 21,
+          "cpa": 3.6,
+          "clicks": 70,
+          "ctr": 0.8527,
+          "reach": 4614,
+          "impressions": 8209,
+          "profile_visits": 942
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120238414991300661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 1.46,
+          "conversations": 1,
+          "cpa": 1.46,
+          "clicks": 4,
+          "ctr": 0.0202,
+          "reach": 144,
+          "impressions": 198,
+          "profile_visits": 22
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238414991310661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 6.72,
+          "conversations": 1,
+          "cpa": 6.72,
+          "clicks": 4,
+          "ctr": 0.5517,
+          "reach": 581,
+          "impressions": 725,
+          "profile_visits": 100
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238414991320661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 6.09,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 10,
+          "ctr": 0.7639,
+          "reach": 943,
+          "impressions": 1309,
+          "profile_visits": 83
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120238415069700661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 0.55,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 62,
+          "impressions": 79,
+          "profile_visits": 6
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238415069710661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 119.87,
+          "conversations": 19,
+          "cpa": 6.31,
+          "clicks": 127,
+          "ctr": 0.8216,
+          "reach": 9295,
+          "impressions": 15458,
+          "profile_visits": 2183
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238415069720661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 6.44,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 11,
+          "ctr": 0.7581,
+          "reach": 1038,
+          "impressions": 1451,
+          "profile_visits": 99
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120238415069730661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 0.88,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.9804,
+          "reach": 94,
+          "impressions": 102,
+          "profile_visits": 10
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238415069740661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 247.18,
+          "conversations": 33,
+          "cpa": 7.49,
+          "clicks": 236,
+          "ctr": 0.712,
+          "reach": 16734,
+          "impressions": 33146,
+          "profile_visits": 4885
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120238415069750661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 1.0,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.6944,
+          "reach": 105,
+          "impressions": 144,
+          "profile_visits": 7
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238415069760661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 37.74,
+          "conversations": 7,
+          "cpa": 5.39,
+          "clicks": 33,
+          "ctr": 0.5,
+          "reach": 3230,
+          "impressions": 6600,
+          "profile_visits": 445
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120238415069770661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 51.47,
+          "conversations": 4,
+          "cpa": 12.87,
+          "clicks": 40,
+          "ctr": 0.5726,
+          "reach": 3777,
+          "impressions": 6986,
+          "profile_visits": 671
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120238415069830661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 2.24,
+          "conversations": 1,
+          "cpa": 2.24,
+          "clicks": 4,
+          "ctr": 0.9709,
+          "reach": 357,
+          "impressions": 412,
+          "profile_visits": 46
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120238415069840661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 5.58,
+          "conversations": 2,
+          "cpa": 2.79,
+          "clicks": 5,
+          "ctr": 0.7949,
+          "reach": 352,
+          "impressions": 629,
+          "profile_visits": 29
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238415069850661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 64.49,
+          "conversations": 3,
+          "cpa": 21.5,
+          "clicks": 52,
+          "ctr": 0.605,
+          "reach": 5890,
+          "impressions": 8595,
+          "profile_visits": 1154
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238415069860661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 0.55,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 115,
+          "impressions": 128,
+          "profile_visits": 4
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120238415070010661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 51.18,
+          "conversations": 9,
+          "cpa": 5.69,
+          "clicks": 47,
+          "ctr": 0.9217,
+          "reach": 2884,
+          "impressions": 5099,
+          "profile_visits": 598
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120238415070020661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 23.22,
+          "conversations": 3,
+          "cpa": 7.74,
+          "clicks": 31,
+          "ctr": 0.8358,
+          "reach": 1657,
+          "impressions": 3709,
+          "profile_visits": 254
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238415070030661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 113.6,
+          "conversations": 9,
+          "cpa": 12.62,
+          "clicks": 75,
+          "ctr": 0.6314,
+          "reach": 8210,
+          "impressions": 11879,
+          "profile_visits": 2327
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238415070040661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 87.55,
+          "conversations": 6,
+          "cpa": 14.59,
+          "clicks": 90,
+          "ctr": 0.6316,
+          "reach": 6827,
+          "impressions": 14249,
+          "profile_visits": 1077
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120240084869340661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 281.57,
+          "conversations": 39,
+          "cpa": 7.22,
+          "clicks": 257,
+          "ctr": 0.9301,
+          "reach": 11940,
+          "impressions": 27631,
+          "profile_visits": 3408
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240084869430661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 9.5,
+          "conversations": 2,
+          "cpa": 4.75,
+          "clicks": 9,
+          "ctr": 0.8629,
+          "reach": 747,
+          "impressions": 1043,
+          "profile_visits": 89
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120240084869490661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 6.1,
+          "conversations": 1,
+          "cpa": 6.1,
+          "clicks": 5,
+          "ctr": 0.9191,
+          "reach": 465,
+          "impressions": 544,
+          "profile_visits": 80
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120240084869500661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 0.83,
+          "conversations": 1,
+          "cpa": 0.83,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 68,
+          "impressions": 78,
+          "profile_visits": 6
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240084869510661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 7.18,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 4,
+          "ctr": 0.6051,
+          "reach": 595,
+          "impressions": 661,
+          "profile_visits": 132
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240084869520661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 62.88,
+          "conversations": 10,
+          "cpa": 6.29,
+          "clicks": 76,
+          "ctr": 0.0111,
+          "reach": 3512,
+          "impressions": 6869,
+          "profile_visits": 611
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240084869710661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 6.28,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 3,
+          "ctr": 0.4425,
+          "reach": 605,
+          "impressions": 678,
+          "profile_visits": 123
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120240084869720661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 1.25,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 82,
+          "impressions": 109,
+          "profile_visits": 13
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120240084869860661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 7.2,
+          "conversations": 2,
+          "cpa": 3.6,
+          "clicks": 10,
+          "ctr": 0.0152,
+          "reach": 531,
+          "impressions": 660,
+          "profile_visits": 89
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120240084869870661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 2.21,
+          "conversations": 1,
+          "cpa": 2.21,
+          "clicks": 2,
+          "ctr": 0.8929,
+          "reach": 181,
+          "impressions": 224,
+          "profile_visits": 20
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240084869880661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 162.38,
+          "conversations": 22,
+          "cpa": 7.38,
+          "clicks": 143,
+          "ctr": 0.0107,
+          "reach": 8798,
+          "impressions": 13319,
+          "profile_visits": 2585
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240084869890661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.72,
+          "conversations": 2,
+          "cpa": 1.86,
+          "clicks": 8,
+          "ctr": 0.014,
+          "reach": 436,
+          "impressions": 570,
+          "profile_visits": 32
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120240084870070661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.73,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.2494,
+          "reach": 320,
+          "impressions": 401,
+          "profile_visits": 30
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240084870080661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 91.07,
+          "conversations": 18,
+          "cpa": 5.06,
+          "clicks": 89,
+          "ctr": 0.0105,
+          "reach": 6039,
+          "impressions": 8441,
+          "profile_visits": 1544
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240084870090661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 6.31,
+          "conversations": 1,
+          "cpa": 6.31,
+          "clicks": 8,
+          "ctr": 0.0112,
+          "reach": 533,
+          "impressions": 713,
+          "profile_visits": 41
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120240084870100661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 13.68,
+          "conversations": 4,
+          "cpa": 3.42,
+          "clicks": 17,
+          "ctr": 0.012,
+          "reach": 1166,
+          "impressions": 1422,
+          "profile_visits": 167
+        },
+        {
+          "name": "Ad - 30 - REELS - R$1,00 - CASTANHAL - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240084870350661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 8.03,
+          "conversations": 1,
+          "cpa": 8.03,
+          "clicks": 6,
+          "ctr": 0.8487,
+          "reach": 511,
+          "impressions": 707,
+          "profile_visits": 49
+        },
+        {
+          "name": "Ad - 29 - REELS - R$1,00 - CASTANHAL - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240084870360661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 103.42,
+          "conversations": 16,
+          "cpa": 6.46,
+          "clicks": 91,
+          "ctr": 0.0102,
+          "reach": 6035,
+          "impressions": 8891,
+          "profile_visits": 1602
+        },
+        {
+          "name": "Ad - 28 - REELS - R$1,00 - CASTANHAL - AQUELA PROMO",
+          "ad_id": "120240084870370661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 0.85,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 79,
+          "impressions": 103,
+          "profile_visits": 10
+        },
+        {
+          "name": "Ad - 27 - REELS - R$1,00 - CASTANHAL - NUNCA FEZ ISSO",
+          "ad_id": "120240084870380661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 5.33,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 9,
+          "ctr": 0.0158,
+          "reach": 481,
+          "impressions": 569,
+          "profile_visits": 80
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA - CASTANHAL",
+          "ad_id": "120240085890150661",
+          "city": "CASTANHAL",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 644.75,
+          "conversations": 120,
+          "cpa": 5.37,
+          "clicks": 553,
+          "ctr": 0.8621,
+          "reach": 17244,
+          "impressions": 64147,
+          "profile_visits": 9717
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - MUITA GENTE",
+          "ad_id": "120240631555590661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 778.95,
+          "conversations": 139,
+          "cpa": 5.6,
+          "clicks": 727,
+          "ctr": 0.9048,
+          "reach": 23927,
+          "impressions": 80347,
+          "profile_visits": 10149
+        },
+        {
+          "name": "Ad 01 - REELS - EXAME DE VISTA - CASTANHAL",
+          "ad_id": "120240631979140661",
+          "city": "CASTANHAL",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 24.83,
+          "conversations": 3,
+          "cpa": 8.28,
+          "clicks": 25,
+          "ctr": 0.876,
+          "reach": 1621,
+          "impressions": 2854,
+          "profile_visits": 450
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - CAIXINHA",
+          "ad_id": "120240910227320661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 22.2,
+          "conversations": 1,
+          "cpa": 22.2,
+          "clicks": 29,
+          "ctr": 0.0103,
+          "reach": 1835,
+          "impressions": 2818,
+          "profile_visits": 522
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - VALOR MEGA ACESSÍVEL",
+          "ad_id": "120240910668780661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "VALOR MEGA ACESSÍVEL",
+          "status": "ATIVO",
+          "spend": 1323.79,
+          "conversations": 320,
+          "cpa": 4.14,
+          "clicks": 1392,
+          "ctr": 0.8181,
+          "reach": 48351,
+          "impressions": 170151,
+          "profile_visits": 21372
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - CORRE PARA GARANTIR",
+          "ad_id": "120240910713180661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.94,
+          "conversations": 1,
+          "cpa": 3.94,
+          "clicks": 3,
+          "ctr": 0.6237,
+          "reach": 281,
+          "impressions": 481,
+          "profile_visits": 53
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CASTANHAL",
+          "ad_id": "120240932349610661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 81.47,
+          "conversations": 18,
+          "cpa": 4.53,
+          "clicks": 68,
+          "ctr": 0.6012,
+          "reach": 2725,
+          "impressions": 11310,
+          "profile_visits": 1569
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CASTANHAL",
+          "ad_id": "120240932519240661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 233.8,
+          "conversations": 53,
+          "cpa": 4.41,
+          "clicks": 212,
+          "ctr": 0.0102,
+          "reach": 7733,
+          "impressions": 20854,
+          "profile_visits": 3940
+        },
+        {
+          "name": "Ad 01 - REELS - MULTIFOCAL - CASTANHAL",
+          "ad_id": "120240932538580661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 187.01,
+          "conversations": 33,
+          "cpa": 5.67,
+          "clicks": 135,
+          "ctr": 0.0104,
+          "reach": 5983,
+          "impressions": 13043,
+          "profile_visits": 2311
+        },
+        {
+          "name": "Ad 01 - REELS - MULTIFOCAL - CASTANHAL",
+          "ad_id": "120240932542390661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 45.25,
+          "conversations": 11,
+          "cpa": 4.11,
+          "clicks": 38,
+          "ctr": 0.7985,
+          "reach": 1885,
+          "impressions": 4759,
+          "profile_visits": 829
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - SE VOCÊ ESTÁ VENDO",
+          "ad_id": "120241382798650661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "SE VOCÊ ESTÁ VENDO",
+          "status": "ATIVO",
+          "spend": 238.36,
+          "conversations": 40,
+          "cpa": 5.96,
+          "clicks": 276,
+          "ctr": 0.9248,
+          "reach": 13509,
+          "impressions": 29845,
+          "profile_visits": 3698
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - NÃO É SORTE É OPORTUNIDADE",
+          "ad_id": "120241382798660661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "NÃO É SORTE",
+          "status": "ATIVO",
+          "spend": 313.17,
+          "conversations": 71,
+          "cpa": 4.41,
+          "clicks": 363,
+          "ctr": 0.8175,
+          "reach": 18112,
+          "impressions": 44401,
+          "profile_visits": 5019
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - SE ESTE VÍDEO",
+          "ad_id": "120241382798670661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "SE ESTE VÍDEO",
+          "status": "ATIVO",
+          "spend": 83.63,
+          "conversations": 13,
+          "cpa": 6.43,
+          "clicks": 73,
+          "ctr": 0.9063,
+          "reach": 4190,
+          "impressions": 8055,
+          "profile_visits": 1302
+        },
+        {
+          "name": "DIA DA MULHER - CASTANHAL",
+          "ad_id": "120242066636680661",
+          "city": "CASTANHAL",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 33.62,
+          "conversations": 1,
+          "cpa": 33.62,
+          "clicks": 6,
+          "ctr": 0.5842,
+          "reach": 155,
+          "impressions": 1027,
+          "profile_visits": 106
+        },
+        {
+          "name": "Ad - 00 - REELS - DIA DA MULHER - CASTANHAL - DIA DA MULHER",
+          "ad_id": "120242131914300661",
+          "city": "CASTANHAL",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 62.6,
+          "conversations": 7,
+          "cpa": 8.94,
+          "clicks": 43,
+          "ctr": 0.6806,
+          "reach": 2756,
+          "impressions": 6318,
+          "profile_visits": 804
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - CASTANHAL",
+          "ad_id": "120242337266720661",
+          "city": "CASTANHAL",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 279.74,
+          "conversations": 38,
+          "cpa": 7.36,
+          "clicks": 170,
+          "ctr": 0.6226,
+          "reach": 9782,
+          "impressions": 27303,
+          "profile_visits": 3060
+        },
+        {
+          "name": "Ad 03 - REELS - AQUECIMENTO - CASTANHAL",
+          "ad_id": "120243099287650661",
+          "city": "CASTANHAL",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.59,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 702,
+          "impressions": 1336,
+          "profile_visits": 67
+        },
+        {
+          "name": "Ad 01 - REELS - AQUECIMENTO - CASTANHAL",
+          "ad_id": "120243099552880661",
+          "city": "CASTANHAL",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 9.51,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 9,
+          "ctr": 0.2431,
+          "reach": 1410,
+          "impressions": 3702,
+          "profile_visits": 230
+        },
+        {
+          "name": "Ad 02 - REELS - AQUECIMENTO - CASTANHAL",
+          "ad_id": "120243099552890661",
+          "city": "CASTANHAL",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 179.64,
+          "conversations": 5,
+          "cpa": 35.93,
+          "clicks": 126,
+          "ctr": 0.1907,
+          "reach": 3615,
+          "impressions": 66087,
+          "profile_visits": 3102
+        },
+        {
+          "name": "Ad 00 - REELS - AQUECIMENTO - CASTANHAL",
+          "ad_id": "120243099552900661",
+          "city": "CASTANHAL",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 10.41,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 11,
+          "ctr": 0.2795,
+          "reach": 1454,
+          "impressions": 3936,
+          "profile_visits": 267
+        },
+        {
+          "name": "Ad 01 - REELS - DOBRO - CASTANHAL —  INFLUENCER",
+          "ad_id": "120243468857730661",
+          "city": "CASTANHAL",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 76.67,
+          "conversations": 5,
+          "cpa": 15.33,
+          "clicks": 36,
+          "ctr": 0.4915,
+          "reach": 4503,
+          "impressions": 7324,
+          "profile_visits": 2247
+        },
+        {
+          "name": "Ad 02 - REELS - MULTIFOCAL - CASTANHAL - MAIS DE 40",
+          "ad_id": "120243469952010661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 3.82,
+          "conversations": 3,
+          "cpa": 1.27,
+          "clicks": 6,
+          "ctr": 0.0191,
+          "reach": 271,
+          "impressions": 314,
+          "profile_visits": 70
+        },
+        {
+          "name": "Ad 02 - REELS - MULTIFOCAL - CASTANHAL - MAIS DE 40",
+          "ad_id": "120243470125660661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 1.88,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 2,
+          "ctr": 0.0107,
+          "reach": 153,
+          "impressions": 187,
+          "profile_visits": 53
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - CASTANHAL — OLHA SÓ ISSO",
+          "ad_id": "120243912085060661",
+          "city": "CASTANHAL",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 5.36,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 3,
+          "ctr": 0.4815,
+          "reach": 366,
+          "impressions": 623,
+          "profile_visits": 115
+        },
+        {
+          "name": "Ad 01 - REELS - DOBRO - CASTANHAL —  RESULTADO EM DOBRO",
+          "ad_id": "120243912085090661",
+          "city": "CASTANHAL",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 46.17,
+          "conversations": 3,
+          "cpa": 15.39,
+          "clicks": 27,
+          "ctr": 0.5364,
+          "reach": 2427,
+          "impressions": 5034,
+          "profile_visits": 824
+        },
+        {
+          "name": "Ad 02 - REELS - DOBRO - CASTANHAL — SEU ÓCULOS VALE DOIS",
+          "ad_id": "120243912670590661",
+          "city": "CASTANHAL",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 23.72,
+          "conversations": 1,
+          "cpa": 23.72,
+          "clicks": 17,
+          "ctr": 0.6501,
+          "reach": 1842,
+          "impressions": 2615,
+          "profile_visits": 385
+        }
+      ],
+      "offers": {
+        "R$ 1,00": {
+          "offer": "R$ 1,00",
+          "spend": 4450.900000000001,
+          "conversations": 824,
+          "clicks": 4442,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.4
+        },
+        "EXAME DE VISTA": {
+          "offer": "EXAME DE VISTA",
+          "spend": 669.58,
+          "conversations": 123,
+          "clicks": 578,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 5.44
+        },
+        "MULTIFOCAL": {
+          "offer": "MULTIFOCAL",
+          "spend": 553.23,
+          "conversations": 118,
+          "clicks": 461,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 4.69
+        },
+        "DIA DA MULHER": {
+          "offer": "DIA DA MULHER",
+          "spend": 96.22,
+          "conversations": 8,
+          "clicks": 49,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 12.03
+        },
+        "EM DOBRO": {
+          "offer": "EM DOBRO",
+          "spend": 431.6600000000001,
+          "conversations": 47,
+          "clicks": 253,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 9.18
+        },
+        "OUTRO": {
+          "offer": "OUTRO",
+          "spend": 203.14999999999998,
+          "conversations": 5,
+          "clicks": 146,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 40.63
+        }
+      },
+      "cpa": 5.69,
+      "active_ads": 66,
+      "top_ads": [
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - VALOR MEGA ACESSÍVEL",
+          "ad_id": "120240910668780661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "VALOR MEGA ACESSÍVEL",
+          "status": "ATIVO",
+          "spend": 1323.79,
+          "conversations": 320,
+          "cpa": 4.14,
+          "clicks": 1392,
+          "ctr": 0.8181,
+          "reach": 48351,
+          "impressions": 170151,
+          "profile_visits": 21372
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - MUITA GENTE",
+          "ad_id": "120240631555590661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 778.95,
+          "conversations": 139,
+          "cpa": 5.6,
+          "clicks": 727,
+          "ctr": 0.9048,
+          "reach": 23927,
+          "impressions": 80347,
+          "profile_visits": 10149
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA - CASTANHAL",
+          "ad_id": "120240085890150661",
+          "city": "CASTANHAL",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 644.75,
+          "conversations": 120,
+          "cpa": 5.37,
+          "clicks": 553,
+          "ctr": 0.8621,
+          "reach": 17244,
+          "impressions": 64147,
+          "profile_visits": 9717
+        },
+        {
+          "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - NÃO É SORTE É OPORTUNIDADE",
+          "ad_id": "120241382798660661",
+          "city": "CASTANHAL",
+          "offer": "R$ 1,00",
+          "hook": "NÃO É SORTE",
+          "status": "ATIVO",
+          "spend": 313.17,
+          "conversations": 71,
+          "cpa": 4.41,
+          "clicks": 363,
+          "ctr": 0.8175,
+          "reach": 18112,
+          "impressions": 44401,
+          "profile_visits": 5019
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CASTANHAL",
+          "ad_id": "120240932519240661",
+          "city": "CASTANHAL",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 233.8,
+          "conversations": 53,
+          "cpa": 4.41,
+          "clicks": 212,
+          "ctr": 0.0102,
+          "reach": 7733,
+          "impressions": 20854,
+          "profile_visits": 3940
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "R$ 1,00",
+          "spend": 4450.900000000001,
+          "conversations": 824,
+          "clicks": 4442,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 5.4
+        },
+        {
+          "offer": "EXAME DE VISTA",
+          "spend": 669.58,
+          "conversations": 123,
+          "clicks": 578,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 5.44
+        },
+        {
+          "offer": "MULTIFOCAL",
+          "spend": 553.23,
+          "conversations": 118,
+          "clicks": 461,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 4.69
+        },
+        {
+          "offer": "EM DOBRO",
+          "spend": 431.6600000000001,
+          "conversations": 47,
+          "clicks": 253,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 9.18
+        },
+        {
+          "offer": "DIA DA MULHER",
+          "spend": 96.22,
+          "conversations": 8,
+          "clicks": 49,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 12.03
+        },
+        {
+          "offer": "OUTRO",
+          "spend": 203.14999999999998,
+          "conversations": 5,
+          "clicks": 146,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 40.63
+        }
+      ]
+    },
+    {
+      "city": "CAPANEMA",
+      "spend": 5540.2300000000005,
+      "conversations": 489,
+      "clicks": 4421,
+      "reach": 252251,
+      "impressions": 711715,
+      "profile_visits": 91597,
+      "ads": [
+        {
+          "name": "ADVANTAGE - 08 - REELS - R$1,00 - CAPANEMA - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120238416174840661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 32.88,
+          "conversations": 3,
+          "cpa": 10.96,
+          "clicks": 45,
+          "ctr": 0.4513,
+          "reach": 4955,
+          "impressions": 9972,
+          "profile_visits": 604
+        },
+        {
+          "name": "ADVANTAGE - 05 - REELS - R$1,00 - CAPANEMA - NUNCA FEZ ISSO",
+          "ad_id": "120238416209520661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 123.21,
+          "conversations": 11,
+          "cpa": 11.2,
+          "clicks": 136,
+          "ctr": 0.7609,
+          "reach": 6839,
+          "impressions": 17874,
+          "profile_visits": 1931
+        },
+        {
+          "name": "ADVANTAGE - 06 - REELS - R$1,00 - CAPANEMA - AQUELA PROMO",
+          "ad_id": "120238416209530661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 10.19,
+          "conversations": 2,
+          "cpa": 5.09,
+          "clicks": 13,
+          "ctr": 0.4096,
+          "reach": 1299,
+          "impressions": 3174,
+          "profile_visits": 182
+        },
+        {
+          "name": "ADVANTAGE - 07 - REELS - R$1,00 - CAPANEMA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120238416209540661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 164.97,
+          "conversations": 14,
+          "cpa": 11.78,
+          "clicks": 147,
+          "ctr": 0.6198,
+          "reach": 11849,
+          "impressions": 23719,
+          "profile_visits": 3385
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - POR UM REAL",
+          "ad_id": "120240024146160661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 14.59,
+          "conversations": 1,
+          "cpa": 14.59,
+          "clicks": 14,
+          "ctr": 0.8872,
+          "reach": 1143,
+          "impressions": 1578,
+          "profile_visits": 169
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - GOLPE",
+          "ad_id": "120240024146170661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 14.37,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 3,
+          "ctr": 0.155,
+          "reach": 1290,
+          "impressions": 1935,
+          "profile_visits": 164
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - ESSA ARMAÇÃO",
+          "ad_id": "120240024146180661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "ESSA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 17.27,
+          "conversations": 2,
+          "cpa": 8.63,
+          "clicks": 9,
+          "ctr": 0.3692,
+          "reach": 1744,
+          "impressions": 2438,
+          "profile_visits": 264
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - SER CARO",
+          "ad_id": "120240024433530661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 15.18,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 11,
+          "ctr": 0.8082,
+          "reach": 1029,
+          "impressions": 1361,
+          "profile_visits": 218
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - DOIS ÓCULOS",
+          "ad_id": "120240024433540661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 15.65,
+          "conversations": 1,
+          "cpa": 15.65,
+          "clicks": 7,
+          "ctr": 0.6114,
+          "reach": 945,
+          "impressions": 1145,
+          "profile_visits": 156
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - CANSOU",
+          "ad_id": "120240024433550661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 17.67,
+          "conversations": 1,
+          "cpa": 17.67,
+          "clicks": 12,
+          "ctr": 0.0105,
+          "reach": 901,
+          "impressions": 1147,
+          "profile_visits": 188
+        },
+        {
+          "name": "ADVANTAGE - 07 - REELS - R$1,00 - CAPANEMA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240085132310661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 436.25,
+          "conversations": 33,
+          "cpa": 13.22,
+          "clicks": 263,
+          "ctr": 0.7663,
+          "reach": 20104,
+          "impressions": 34321,
+          "profile_visits": 6945
+        },
+        {
+          "name": "ADVANTAGE - 06 - REELS - R$1,00 - CAPANEMA - AQUELA PROMO",
+          "ad_id": "120240085132320661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 2.85,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 4,
+          "ctr": 0.0102,
+          "reach": 271,
+          "impressions": 392,
+          "profile_visits": 30
+        },
+        {
+          "name": "ADVANTAGE - 05 - REELS - R$1,00 - CAPANEMA - NUNCA FEZ ISSO",
+          "ad_id": "120240085132330661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 21.0,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 14,
+          "ctr": 0.8734,
+          "reach": 1247,
+          "impressions": 1603,
+          "profile_visits": 236
+        },
+        {
+          "name": "ADVANTAGE - 08 - REELS - R$1,00 - CAPANEMA - IMPOSSÍVEL ACREDITAR",
+          "ad_id": "120240085132340661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 40.0,
+          "conversations": 2,
+          "cpa": 20.0,
+          "clicks": 29,
+          "ctr": 0.5073,
+          "reach": 3928,
+          "impressions": 5716,
+          "profile_visits": 427
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - CANSOU",
+          "ad_id": "120240085781940661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "MULTIFOCAL",
+          "status": "ATIVO",
+          "spend": 101.98,
+          "conversations": 6,
+          "cpa": 17.0,
+          "clicks": 53,
+          "ctr": 0.9031,
+          "reach": 3386,
+          "impressions": 5869,
+          "profile_visits": 894
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - SER CARO",
+          "ad_id": "120240085781980661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 345.94,
+          "conversations": 24,
+          "cpa": 14.41,
+          "clicks": 170,
+          "ctr": 0.932,
+          "reach": 8643,
+          "impressions": 18240,
+          "profile_visits": 2991
+        },
+        {
+          "name": "Ad 00 - REELS - MULTIFOCAL - CAPANEMA - DOIS ÓCULOS",
+          "ad_id": "120240085781990661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "DOIS ÓCULOS",
+          "status": "ATIVO",
+          "spend": 175.92,
+          "conversations": 10,
+          "cpa": 17.59,
+          "clicks": 95,
+          "ctr": 0.915,
+          "reach": 5923,
+          "impressions": 10382,
+          "profile_visits": 1766
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA - CAPANEMA",
+          "ad_id": "120240085851310661",
+          "city": "CAPANEMA",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 190.82,
+          "conversations": 21,
+          "cpa": 9.09,
+          "clicks": 154,
+          "ctr": 0.6131,
+          "reach": 8590,
+          "impressions": 25120,
+          "profile_visits": 3640
+        },
+        {
+          "name": "Ad 01 - REELS - EXAME DE VISTA - CAPANEMA",
+          "ad_id": "120240630519500661",
+          "city": "CAPANEMA",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 894.2,
+          "conversations": 114,
+          "cpa": 7.84,
+          "clicks": 875,
+          "ctr": 0.6931,
+          "reach": 35470,
+          "impressions": 126239,
+          "profile_visits": 17518
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - MUITA GENTE",
+          "ad_id": "120240631707670661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 468.74,
+          "conversations": 34,
+          "cpa": 13.79,
+          "clicks": 325,
+          "ctr": 0.5602,
+          "reach": 16186,
+          "impressions": 58017,
+          "profile_visits": 6334
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - SE VOCÊ ESTÁ VENDO",
+          "ad_id": "120241290453820661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "SE VOCÊ ESTÁ VENDO",
+          "status": "ATIVO",
+          "spend": 255.09,
+          "conversations": 29,
+          "cpa": 8.8,
+          "clicks": 284,
+          "ctr": 0.7202,
+          "reach": 14257,
+          "impressions": 39434,
+          "profile_visits": 5450
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - NÃO É SORTE É OPORTUNIDADE",
+          "ad_id": "120241290609360661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "NÃO É SORTE",
+          "status": "ATIVO",
+          "spend": 197.27,
+          "conversations": 15,
+          "cpa": 13.15,
+          "clicks": 205,
+          "ctr": 0.4142,
+          "reach": 13626,
+          "impressions": 49498,
+          "profile_visits": 4859
+        },
+        {
+          "name": "Ad 00 - REELS - R$1,00 - CAPANEMA - SE ESTE VÍDEO",
+          "ad_id": "120241290623470661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "SE ESTE VÍDEO",
+          "status": "ATIVO",
+          "spend": 106.45,
+          "conversations": 5,
+          "cpa": 21.29,
+          "clicks": 56,
+          "ctr": 0.2735,
+          "reach": 5765,
+          "impressions": 20477,
+          "profile_visits": 1743
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - SE VOCÊ ESTÁ VENDO",
+          "ad_id": "120241383156600661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "SE VOCÊ ESTÁ VENDO",
+          "status": "ATIVO",
+          "spend": 655.88,
+          "conversations": 63,
+          "cpa": 10.41,
+          "clicks": 486,
+          "ctr": 0.7838,
+          "reach": 26190,
+          "impressions": 62006,
+          "profile_visits": 8067
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - NÃO É SORTE É OPORTUNIDADE",
+          "ad_id": "120241383156610661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "NÃO É SORTE",
+          "status": "ATIVO",
+          "spend": 255.6,
+          "conversations": 29,
+          "cpa": 8.81,
+          "clicks": 236,
+          "ctr": 0.5942,
+          "reach": 17237,
+          "impressions": 39717,
+          "profile_visits": 5062
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - SE ESTE VÍDEO",
+          "ad_id": "120241383156620661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "SE ESTE VÍDEO",
+          "status": "ATIVO",
+          "spend": 200.49,
+          "conversations": 19,
+          "cpa": 10.55,
+          "clicks": 110,
+          "ctr": 0.4975,
+          "reach": 6046,
+          "impressions": 22110,
+          "profile_visits": 3132
+        },
+        {
+          "name": "DIA DA MULHER - CAPANEMA",
+          "ad_id": "120242067105540661",
+          "city": "CAPANEMA",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 3.13,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 4,
+          "impressions": 19,
+          "profile_visits": 1
+        },
+        {
+          "name": "Ad - 00 - REELS - DIA DA MULHER - CAPANEMA - DIA DA MULHER",
+          "ad_id": "120242132355130661",
+          "city": "CAPANEMA",
+          "offer": "DIA DA MULHER",
+          "hook": "DIA DA MULHER",
+          "status": "ATIVO",
+          "spend": 46.42,
+          "conversations": 4,
+          "cpa": 11.61,
+          "clicks": 34,
+          "ctr": 0.6855,
+          "reach": 2162,
+          "impressions": 4960,
+          "profile_visits": 591
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - EM DOBRO - CAPANEMA - ÓCULOS EM DOBRO",
+          "ad_id": "120242440237860661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "ÓCULOS EM DOBRO",
+          "status": "ATIVO",
+          "spend": 16.97,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 12,
+          "ctr": 0.4706,
+          "reach": 1460,
+          "impressions": 2550,
+          "profile_visits": 227
+        },
+        {
+          "name": "ADVANTAGE - 01 - REELS - EM DOBRO - CAPANEMA - ÓCULOS EM DOBRO",
+          "ad_id": "120242440429040661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "ÓCULOS EM DOBRO",
+          "status": "ATIVO",
+          "spend": 319.47,
+          "conversations": 32,
+          "cpa": 9.98,
+          "clicks": 238,
+          "ctr": 0.5402,
+          "reach": 11400,
+          "impressions": 44058,
+          "profile_visits": 5348
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - CAPANEMA - INFLUENCER",
+          "ad_id": "120242971222460661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 58.19,
+          "conversations": 4,
+          "cpa": 14.55,
+          "clicks": 88,
+          "ctr": 0.0118,
+          "reach": 4364,
+          "impressions": 7446,
+          "profile_visits": 2021
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - CAPANEMA - INFLUENCER",
+          "ad_id": "120242971222470661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 74.55,
+          "conversations": 3,
+          "cpa": 24.85,
+          "clicks": 123,
+          "ctr": 0.0127,
+          "reach": 4922,
+          "impressions": 9681,
+          "profile_visits": 2960
+        },
+        {
+          "name": "Ad 00 - REELS - DOBRO - CAPANEMA - INFLUENCER",
+          "ad_id": "120242971222480661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "DOBRO",
+          "status": "ATIVO",
+          "spend": 41.76,
+          "conversations": 2,
+          "cpa": 20.88,
+          "clicks": 43,
+          "ctr": 0.9407,
+          "reach": 2698,
+          "impressions": 4571,
+          "profile_visits": 1220
+        },
+        {
+          "name": "Ad 01 - REELS - AQUECIMENTO - CAPANEMA",
+          "ad_id": "120243100234500661",
+          "city": "CAPANEMA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 5.86,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 0,
+          "ctr": 0.0,
+          "reach": 683,
+          "impressions": 1567,
+          "profile_visits": 112
+        },
+        {
+          "name": "Ad 03 - REELS - AQUECIMENTO - CAPANEMA",
+          "ad_id": "120243100234510661",
+          "city": "CAPANEMA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 124.81,
+          "conversations": 4,
+          "cpa": 31.2,
+          "clicks": 77,
+          "ctr": 0.248,
+          "reach": 1659,
+          "impressions": 31052,
+          "profile_visits": 1331
+        },
+        {
+          "name": "Ad 00 - REELS - AQUECIMENTO - CAPANEMA",
+          "ad_id": "120243100234530661",
+          "city": "CAPANEMA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 4.62,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 2,
+          "ctr": 0.161,
+          "reach": 624,
+          "impressions": 1242,
+          "profile_visits": 71
+        },
+        {
+          "name": "Ad 02 - REELS - AQUECIMENTO - CAPANEMA",
+          "ad_id": "120243100234540661",
+          "city": "CAPANEMA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 5.8,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 2,
+          "ctr": 0.1289,
+          "reach": 690,
+          "impressions": 1552,
+          "profile_visits": 85
+        },
+        {
+          "name": "ADVANTAGE - 02 - REELS - EM DOBRO - CAPANEMA - ÓCULOS EM DOBRO",
+          "ad_id": "120243469779070661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "ÓCULOS EM DOBRO",
+          "status": "ATIVO",
+          "spend": 2.4,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 4,
+          "ctr": 0.0158,
+          "reach": 230,
+          "impressions": 253,
+          "profile_visits": 91
+        },
+        {
+          "name": "Ad 04 - REELS - AQUECIMENTO - CAPANEMA",
+          "ad_id": "120243841505500661",
+          "city": "CAPANEMA",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 56.1,
+          "conversations": 1,
+          "cpa": 56.1,
+          "clicks": 38,
+          "ctr": 0.22,
+          "reach": 1418,
+          "impressions": 17272,
+          "profile_visits": 1103
+        },
+        {
+          "name": "Ad 05 - REELS - MULTIFOCAL - CAPANEMA - SER CARO",
+          "ad_id": "120243841556270661",
+          "city": "CAPANEMA",
+          "offer": "MULTIFOCAL",
+          "hook": "SER CARO",
+          "status": "ATIVO",
+          "spend": 2.04,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.1355,
+          "reach": 444,
+          "impressions": 738,
+          "profile_visits": 26
+        },
+        {
+          "name": "Ad 04 - REELS - R$1,00 - CAPANEMA - 1,00",
+          "ad_id": "120243841603310661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.65,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 3,
+          "ctr": 0.2362,
+          "reach": 630,
+          "impressions": 1270,
+          "profile_visits": 55
+        }
+      ],
+      "offers": {
+        "R$ 1,00": {
+          "offer": "R$ 1,00",
+          "spend": 3020.7500000000005,
+          "conversations": 262,
+          "clicks": 2382,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 11.53
+        },
+        "MULTIFOCAL": {
+          "offer": "MULTIFOCAL",
+          "spend": 674.38,
+          "conversations": 42,
+          "clicks": 349,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 16.06
+        },
+        "EXAME DE VISTA": {
+          "offer": "EXAME DE VISTA",
+          "spend": 1085.02,
+          "conversations": 135,
+          "clicks": 1029,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 8.04
+        },
+        "DIA DA MULHER": {
+          "offer": "DIA DA MULHER",
+          "spend": 49.550000000000004,
+          "conversations": 4,
+          "clicks": 34,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 12.39
+        },
+        "EM DOBRO": {
+          "offer": "EM DOBRO",
+          "spend": 513.34,
+          "conversations": 41,
+          "clicks": 508,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 12.52
+        },
+        "OUTRO": {
+          "offer": "OUTRO",
+          "spend": 197.19000000000003,
+          "conversations": 5,
+          "clicks": 119,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 39.44
+        }
+      },
+      "cpa": 11.33,
+      "active_ads": 41,
+      "top_ads": [
+        {
+          "name": "Ad 01 - REELS - EXAME DE VISTA - CAPANEMA",
+          "ad_id": "120240630519500661",
+          "city": "CAPANEMA",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 894.2,
+          "conversations": 114,
+          "cpa": 7.84,
+          "clicks": 875,
+          "ctr": 0.6931,
+          "reach": 35470,
+          "impressions": 126239,
+          "profile_visits": 17518
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - SE VOCÊ ESTÁ VENDO",
+          "ad_id": "120241383156600661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "SE VOCÊ ESTÁ VENDO",
+          "status": "ATIVO",
+          "spend": 655.88,
+          "conversations": 63,
+          "cpa": 10.41,
+          "clicks": 486,
+          "ctr": 0.7838,
+          "reach": 26190,
+          "impressions": 62006,
+          "profile_visits": 8067
+        },
+        {
+          "name": "ADVANTAGE - 00 - REELS - R$1,00 - CAPANEMA - MUITA GENTE",
+          "ad_id": "120240631707670661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "MUITA GENTE",
+          "status": "ATIVO",
+          "spend": 468.74,
+          "conversations": 34,
+          "cpa": 13.79,
+          "clicks": 325,
+          "ctr": 0.5602,
+          "reach": 16186,
+          "impressions": 58017,
+          "profile_visits": 6334
+        },
+        {
+          "name": "ADVANTAGE - 07 - REELS - R$1,00 - CAPANEMA - COMO QUE UMA ARMAÇÃO",
+          "ad_id": "120240085132310661",
+          "city": "CAPANEMA",
+          "offer": "R$ 1,00",
+          "hook": "COMO QUE UMA ARMAÇÃO",
+          "status": "ATIVO",
+          "spend": 436.25,
+          "conversations": 33,
+          "cpa": 13.22,
+          "clicks": 263,
+          "ctr": 0.7663,
+          "reach": 20104,
+          "impressions": 34321,
+          "profile_visits": 6945
+        },
+        {
+          "name": "ADVANTAGE - 01 - REELS - EM DOBRO - CAPANEMA - ÓCULOS EM DOBRO",
+          "ad_id": "120242440429040661",
+          "city": "CAPANEMA",
+          "offer": "EM DOBRO",
+          "hook": "ÓCULOS EM DOBRO",
+          "status": "ATIVO",
+          "spend": 319.47,
+          "conversations": 32,
+          "cpa": 9.98,
+          "clicks": 238,
+          "ctr": 0.5402,
+          "reach": 11400,
+          "impressions": 44058,
+          "profile_visits": 5348
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "R$ 1,00",
+          "spend": 3020.7500000000005,
+          "conversations": 262,
+          "clicks": 2382,
+          "colors": {
+            "bg": "#FFF2CC",
+            "text": "#8B6914"
+          },
+          "cpa": 11.53
+        },
+        {
+          "offer": "EXAME DE VISTA",
+          "spend": 1085.02,
+          "conversations": 135,
+          "clicks": 1029,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 8.04
+        },
+        {
+          "offer": "MULTIFOCAL",
+          "spend": 674.38,
+          "conversations": 42,
+          "clicks": 349,
+          "colors": {
+            "bg": "#D9E2F3",
+            "text": "#34659E"
+          },
+          "cpa": 16.06
+        },
+        {
+          "offer": "EM DOBRO",
+          "spend": 513.34,
+          "conversations": 41,
+          "clicks": 508,
+          "colors": {
+            "bg": "#E2EFDA",
+            "text": "#2D6A2E"
+          },
+          "cpa": 12.52
+        },
+        {
+          "offer": "OUTRO",
+          "spend": 197.19000000000003,
+          "conversations": 5,
+          "clicks": 119,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 39.44
+        },
+        {
+          "offer": "DIA DA MULHER",
+          "spend": 49.550000000000004,
+          "conversations": 4,
+          "clicks": 34,
+          "colors": {
+            "bg": "#C6EFCE",
+            "text": "#1B5E20"
+          },
+          "cpa": 12.39
+        }
+      ]
+    },
+    {
+      "city": "MARITUBA",
+      "spend": 856.25,
+      "conversations": 107,
+      "clicks": 619,
+      "reach": 17596,
+      "impressions": 67935,
+      "profile_visits": 11535,
+      "ads": [
+        {
+          "name": "Ad 00 - REELS - LIGAÇÃO - MARITUBA - VOCÊ PRECISANDO",
+          "ad_id": "120241113209350661",
+          "city": "MARITUBA",
+          "offer": "LIGAÇÃO",
+          "hook": "VOCÊ PRECISANDO",
+          "status": "ATIVO",
+          "spend": 128.73,
+          "conversations": 11,
+          "cpa": 11.7,
+          "clicks": 96,
+          "ctr": 0.0108,
+          "reach": 3605,
+          "impressions": 8883,
+          "profile_visits": 1360
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO - MARITUBA - ALERTA URGENTE",
+          "ad_id": "120241113361340661",
+          "city": "MARITUBA",
+          "offer": "LIGAÇÃO",
+          "hook": "ALERTA URGENTE",
+          "status": "ATIVO",
+          "spend": 727.52,
+          "conversations": 96,
+          "cpa": 7.58,
+          "clicks": 523,
+          "ctr": 0.8857,
+          "reach": 13991,
+          "impressions": 59052,
+          "profile_visits": 10175
+        }
+      ],
+      "offers": {
+        "LIGAÇÃO": {
+          "offer": "LIGAÇÃO",
+          "spend": 856.25,
+          "conversations": 107,
+          "clicks": 619,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 8.0
+        }
+      },
+      "cpa": 8.0,
+      "active_ads": 2,
+      "top_ads": [
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO - MARITUBA - ALERTA URGENTE",
+          "ad_id": "120241113361340661",
+          "city": "MARITUBA",
+          "offer": "LIGAÇÃO",
+          "hook": "ALERTA URGENTE",
+          "status": "ATIVO",
+          "spend": 727.52,
+          "conversations": 96,
+          "cpa": 7.58,
+          "clicks": 523,
+          "ctr": 0.8857,
+          "reach": 13991,
+          "impressions": 59052,
+          "profile_visits": 10175
+        },
+        {
+          "name": "Ad 00 - REELS - LIGAÇÃO - MARITUBA - VOCÊ PRECISANDO",
+          "ad_id": "120241113209350661",
+          "city": "MARITUBA",
+          "offer": "LIGAÇÃO",
+          "hook": "VOCÊ PRECISANDO",
+          "status": "ATIVO",
+          "spend": 128.73,
+          "conversations": 11,
+          "cpa": 11.7,
+          "clicks": 96,
+          "ctr": 0.0108,
+          "reach": 3605,
+          "impressions": 8883,
+          "profile_visits": 1360
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "LIGAÇÃO",
+          "spend": 856.25,
+          "conversations": 107,
+          "clicks": 619,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 8.0
+        }
+      ]
+    },
+    {
+      "city": "OUTRO",
+      "spend": 846.9399999999998,
+      "conversations": 270,
+      "clicks": 1062,
+      "reach": 135159,
+      "impressions": 223820,
+      "profile_visits": 69320,
+      "ads": [
+        {
+          "name": "Ad - 00 - REELS - LIGAÇÃO",
+          "ad_id": "120231674213550661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 62.42,
+          "conversations": 8,
+          "cpa": 7.8,
+          "clicks": 71,
+          "ctr": 0.0167,
+          "reach": 2490,
+          "impressions": 4249,
+          "profile_visits": 812
+        },
+        {
+          "name": "Ad 28 - Engajamento",
+          "ad_id": "120238417642340661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 7.75,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 7,
+          "ctr": 0.198,
+          "reach": 2883,
+          "impressions": 3536,
+          "profile_visits": 1140
+        },
+        {
+          "name": "Ad 30 - Engajamento",
+          "ad_id": "120238417765960661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 44.14,
+          "conversations": 2,
+          "cpa": 22.07,
+          "clicks": 29,
+          "ctr": 0.1578,
+          "reach": 12102,
+          "impressions": 18383,
+          "profile_visits": 6368
+        },
+        {
+          "name": "Ad 31 - Engajamento",
+          "ad_id": "120238417780870661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 70.08,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 48,
+          "ctr": 0.1536,
+          "reach": 17638,
+          "impressions": 31260,
+          "profile_visits": 9578
+        },
+        {
+          "name": "Ad 29 - Engajamento",
+          "ad_id": "120238417804550661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 71.62,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 44,
+          "ctr": 0.1049,
+          "reach": 26514,
+          "impressions": 41963,
+          "profile_visits": 12030
+        },
+        {
+          "name": "Ad 28 - Engajamento",
+          "ad_id": "120238417804570661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 1.51,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.1416,
+          "reach": 657,
+          "impressions": 706,
+          "profile_visits": 241
+        },
+        {
+          "name": "Ad 30 - Engajamento",
+          "ad_id": "120238417804580661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 48.55,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 47,
+          "ctr": 0.1803,
+          "reach": 19118,
+          "impressions": 26070,
+          "profile_visits": 9590
+        },
+        {
+          "name": "Ad 29 - Engajamento",
+          "ad_id": "120238417804590661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 102.83,
+          "conversations": 1,
+          "cpa": 102.83,
+          "clicks": 44,
+          "ctr": 0.155,
+          "reach": 13590,
+          "impressions": 28393,
+          "profile_visits": 9793
+        },
+        {
+          "name": "Ad 31 - Engajamento",
+          "ad_id": "120238417804600661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 3.88,
+          "conversations": 1,
+          "cpa": 3.88,
+          "clicks": 2,
+          "ctr": 0.1052,
+          "reach": 1550,
+          "impressions": 1902,
+          "profile_visits": 547
+        },
+        {
+          "name": "Ad 28 - Engajamento",
+          "ad_id": "120238417804610661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 16.0,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 6,
+          "ctr": 0.094,
+          "reach": 4261,
+          "impressions": 6385,
+          "profile_visits": 2115
+        },
+        {
+          "name": "Ad 29 - Engajamento",
+          "ad_id": "120238417804670661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 64.32,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 41,
+          "ctr": 0.1428,
+          "reach": 17001,
+          "impressions": 28702,
+          "profile_visits": 8969
+        },
+        {
+          "name": "Ad 31 - Engajamento",
+          "ad_id": "120238417804680661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 4.29,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 7,
+          "ctr": 0.263,
+          "reach": 2161,
+          "impressions": 2662,
+          "profile_visits": 825
+        },
+        {
+          "name": "Ad 28 - Engajamento",
+          "ad_id": "120238417804690661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 2.62,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 3,
+          "ctr": 0.1704,
+          "reach": 1505,
+          "impressions": 1761,
+          "profile_visits": 522
+        },
+        {
+          "name": "Ad - 00 - REELS - VAGA",
+          "ad_id": "120238741130050661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 213.43,
+          "conversations": 225,
+          "cpa": 0.95,
+          "clicks": 615,
+          "ctr": 0.0285,
+          "reach": 8642,
+          "impressions": 21579,
+          "profile_visits": 4947
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA",
+          "ad_id": "120240082890700661",
+          "city": "OUTRO",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 2.06,
+          "conversations": 1,
+          "cpa": 2.06,
+          "clicks": 3,
+          "ctr": 0.0142,
+          "reach": 174,
+          "impressions": 212,
+          "profile_visits": 40
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA",
+          "ad_id": "120240083204360661",
+          "city": "OUTRO",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 3.92,
+          "conversations": 2,
+          "cpa": 1.96,
+          "clicks": 6,
+          "ctr": 0.0311,
+          "reach": 171,
+          "impressions": 193,
+          "profile_visits": 56
+        },
+        {
+          "name": "Ad 00 - REELS - EXAME DE VISTA",
+          "ad_id": "120240083417950661",
+          "city": "OUTRO",
+          "offer": "EXAME DE VISTA",
+          "hook": "EXAME DE VISTA",
+          "status": "ATIVO",
+          "spend": 3.01,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 2,
+          "ctr": 0.692,
+          "reach": 221,
+          "impressions": 289,
+          "profile_visits": 44
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO",
+          "ad_id": "120243792380610661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 20.06,
+          "conversations": 4,
+          "cpa": 5.01,
+          "clicks": 16,
+          "ctr": 0.0202,
+          "reach": 665,
+          "impressions": 791,
+          "profile_visits": 218
+        },
+        {
+          "name": "Ad - 00 - REELS - LIGAÇÃO",
+          "ad_id": "120243792380620661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 1.16,
+          "conversations": 0,
+          "cpa": 0.0,
+          "clicks": 1,
+          "ctr": 0.0217,
+          "reach": 37,
+          "impressions": 46,
+          "profile_visits": 16
+        },
+        {
+          "name": "Ad - 00 - REELS - LIGAÇÃO",
+          "ad_id": "120243854846870661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 6.86,
+          "conversations": 1,
+          "cpa": 6.86,
+          "clicks": 6,
+          "ctr": 0.0191,
+          "reach": 255,
+          "impressions": 314,
+          "profile_visits": 66
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO",
+          "ad_id": "120243854846880661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 96.43,
+          "conversations": 25,
+          "cpa": 3.86,
+          "clicks": 63,
+          "ctr": 0.0142,
+          "reach": 3524,
+          "impressions": 4424,
+          "profile_visits": 1403
+        }
+      ],
+      "offers": {
+        "LIGAÇÃO": {
+          "offer": "LIGAÇÃO",
+          "spend": 186.93,
+          "conversations": 38,
+          "clicks": 157,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 4.92
+        },
+        "OUTRO": {
+          "offer": "OUTRO",
+          "spend": 651.02,
+          "conversations": 229,
+          "clicks": 894,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 2.84
+        },
+        "EXAME DE VISTA": {
+          "offer": "EXAME DE VISTA",
+          "spend": 8.99,
+          "conversations": 3,
+          "clicks": 11,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 3.0
+        }
+      },
+      "cpa": 3.14,
+      "active_ads": 21,
+      "top_ads": [
+        {
+          "name": "Ad - 00 - REELS - VAGA",
+          "ad_id": "120238741130050661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 213.43,
+          "conversations": 225,
+          "cpa": 0.95,
+          "clicks": 615,
+          "ctr": 0.0285,
+          "reach": 8642,
+          "impressions": 21579,
+          "profile_visits": 4947
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO",
+          "ad_id": "120243854846880661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 96.43,
+          "conversations": 25,
+          "cpa": 3.86,
+          "clicks": 63,
+          "ctr": 0.0142,
+          "reach": 3524,
+          "impressions": 4424,
+          "profile_visits": 1403
+        },
+        {
+          "name": "Ad - 00 - REELS - LIGAÇÃO",
+          "ad_id": "120231674213550661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 62.42,
+          "conversations": 8,
+          "cpa": 7.8,
+          "clicks": 71,
+          "ctr": 0.0167,
+          "reach": 2490,
+          "impressions": 4249,
+          "profile_visits": 812
+        },
+        {
+          "name": "Ad 01 - REELS - LIGAÇÃO",
+          "ad_id": "120243792380610661",
+          "city": "OUTRO",
+          "offer": "LIGAÇÃO",
+          "hook": "LIGAÇÃO",
+          "status": "ATIVO",
+          "spend": 20.06,
+          "conversations": 4,
+          "cpa": 5.01,
+          "clicks": 16,
+          "ctr": 0.0202,
+          "reach": 665,
+          "impressions": 791,
+          "profile_visits": 218
+        },
+        {
+          "name": "Ad 30 - Engajamento",
+          "ad_id": "120238417765960661",
+          "city": "OUTRO",
+          "offer": "OUTRO",
+          "hook": "OUTRO",
+          "status": "ATIVO",
+          "spend": 44.14,
+          "conversations": 2,
+          "cpa": 22.07,
+          "clicks": 29,
+          "ctr": 0.1578,
+          "reach": 12102,
+          "impressions": 18383,
+          "profile_visits": 6368
+        }
+      ],
+      "offers_list": [
+        {
+          "offer": "OUTRO",
+          "spend": 651.02,
+          "conversations": 229,
+          "clicks": 894,
+          "colors": {
+            "bg": "#F3F4F6",
+            "text": "#374151"
+          },
+          "cpa": 2.84
+        },
+        {
+          "offer": "LIGAÇÃO",
+          "spend": 186.93,
+          "conversations": 38,
+          "clicks": 157,
+          "colors": {
+            "bg": "#BDD7EE",
+            "text": "#1E5A8D"
+          },
+          "cpa": 4.92
+        },
+        {
+          "offer": "EXAME DE VISTA",
+          "spend": 8.99,
+          "conversations": 3,
+          "clicks": 11,
+          "colors": {
+            "bg": "#FCE4D6",
+            "text": "#A0522D"
+          },
+          "cpa": 3.0
+        }
+      ]
+    }
+  ],
+  "offer_colors": {
+    "R$ 1,00": {
+      "bg": "#FFF2CC",
+      "text": "#8B6914"
+    },
+    "MULTIFOCAL": {
+      "bg": "#D9E2F3",
+      "text": "#34659E"
+    },
+    "EXAME DE VISTA": {
+      "bg": "#FCE4D6",
+      "text": "#A0522D"
+    },
+    "LIGAÇÃO": {
+      "bg": "#BDD7EE",
+      "text": "#1E5A8D"
+    },
+    "EM DOBRO": {
+      "bg": "#E2EFDA",
+      "text": "#2D6A2E"
+    },
+    "DIA DA MULHER": {
+      "bg": "#C6EFCE",
+      "text": "#1B5E20"
+    },
+    "OUTRO": {
+      "bg": "#F3F4F6",
+      "text": "#374151"
+    }
+  }
+};
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     App JavaScript
+══════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────
+// Utilities
+// ──────────────────────────────────────────────
+
+const fmt = {
+  brl: v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  num: v => Number(v).toLocaleString('pt-BR'),
+  pct: v => (Number(v) * 100).toFixed(1) + '%',
+  dec: (v, d=2) => Number(v).toFixed(d),
+};
+
+function healthClass(cpa) {
+  if (cpa === 0) return { cls: 'health-ok', label: '—' };
+  if (cpa <= 5)  return { cls: 'health-otimo', label: 'Ótimo' };
+  if (cpa <= 7)  return { cls: 'health-ok', label: 'OK' };
+  return { cls: 'health-caro', label: 'Caro' };
+}
+
+function cpaColor(cpa) {
+  if (cpa === 0) return '';
+  if (cpa <= 5)  return 'green';
+  if (cpa <= 7)  return 'gold';
+  return 'red';
+}
+
+function offerBadgeStyle(offer) {
+  const colors = DASHBOARD_DATA.offer_colors;
+  const c = colors[offer] || colors['OUTRO'];
+  return `background:${c.bg};color:${c.text}`;
+}
+
+// ──────────────────────────────────────────────
+// Header & Footer
+// ──────────────────────────────────────────────
+
+function initHeaderFooter() {
+  document.getElementById('period-label').textContent = DASHBOARD_DATA.period_label;
+
+  const gen = DASHBOARD_DATA.generated_at;
+  if (gen) {
+    const d = new Date(gen);
+    document.getElementById('generated-at').textContent =
+      d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  const p = DASHBOARD_DATA.period;
+  document.getElementById('api-period').textContent = `${p.start} → ${p.end}`;
+}
+
+// ──────────────────────────────────────────────
+// KPI Cards
+// ──────────────────────────────────────────────
+
+function renderKPIs() {
+  const t = DASHBOARD_DATA.totals;
+  const kpis = [
+    {
+      label: 'Investimento',
+      value: fmt.brl(t.spend),
+      sub: `${t.active_ads} anúncios ativos`,
+      accent: false,
+    },
+    {
+      label: 'Conversas',
+      value: fmt.num(t.conversations),
+      sub: 'Mensagens iniciadas',
+      accent: true,
+    },
+    {
+      label: 'CPA Médio',
+      value: fmt.brl(t.cpa),
+      sub: 'Custo por conversa',
+      accent: false,
+    },
+    {
+      label: 'Alcance',
+      value: fmt.num(t.reach),
+      sub: 'Pessoas únicas',
+      accent: false,
+    },
+    {
+      label: 'Visitas ao Perfil',
+      value: fmt.num(t.profile_visits),
+      sub: 'Via anúncios',
+      accent: false,
+    },
+    {
+      label: 'Anúncios',
+      value: `${t.active_ads}/${t.ads_count}`,
+      sub: 'Ativos / Total',
+      accent: false,
+    },
+  ];
+
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value${k.accent ? ' accent' : ''} font-mono">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// City Selector
+// ──────────────────────────────────────────────
+
+let activeCity = null;
+let offerChart = null;
+
+function renderCitySelector() {
+  const cities = DASHBOARD_DATA.cities;
+  const container = document.getElementById('city-selector');
+
+  container.innerHTML = cities.map((c, i) => `
+    <button class="city-btn${i === 0 ? ' active' : ''}"
+            onclick="selectCity('${c.city}')"
+            id="citybtn-${c.city}">
+      <span class="city-btn-name">${c.city}</span>
+      <span class="city-btn-stats">
+        <span>${c.conversations} conv.</span>
+        <span>·</span>
+        <span class="city-btn-stat-val">${fmt.brl(c.cpa)}</span>
+      </span>
+    </button>
+  `).join('');
+
+  if (cities.length > 0) {
+    selectCity(cities[0].city);
+  }
+}
+
+function selectCity(cityName) {
+  // Update button states
+  document.querySelectorAll('.city-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('citybtn-' + cityName);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  activeCity = cityName;
+  const cityData = DASHBOARD_DATA.cities.find(c => c.city === cityName);
+  if (!cityData) return;
+
+  renderCityDetail(cityData);
+}
+
+// ──────────────────────────────────────────────
+// City Detail
+// ──────────────────────────────────────────────
+
+function renderCityDetail(city) {
+  const container = document.getElementById('city-detail-container');
+  const cpaColorClass = cpaColor(city.cpa);
+
+  container.innerHTML = `
+    <!-- City Metrics -->
+    <div class="metrics-grid-3">
+      <div class="metric-card">
+        <div class="metric-label">Investimento</div>
+        <div class="metric-value font-mono">${fmt.brl(city.spend)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Conversas</div>
+        <div class="metric-value font-mono green">${fmt.num(city.conversations)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">CPA</div>
+        <div class="metric-value font-mono ${cpaColorClass}">${fmt.brl(city.cpa)}</div>
+      </div>
+    </div>
+    <div class="metrics-grid-4">
+      <div class="metric-card">
+        <div class="metric-label">Alcance</div>
+        <div class="metric-value font-mono">${fmt.num(city.reach)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Impressões</div>
+        <div class="metric-value font-mono">${fmt.num(city.impressions)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Cliques</div>
+        <div class="metric-value font-mono">${fmt.num(city.clicks)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Anúncios ativos</div>
+        <div class="metric-value font-mono">${city.active_ads}</div>
+      </div>
+    </div>
+
+    <!-- Chart + Table -->
+    <div class="chart-table-grid">
+      <div class="card">
+        <div class="card-header">Investimento e CPA por oferta</div>
+        <div class="card-body">
+          <canvas id="offers-chart" height="260"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">Ofertas</div>
+        <div class="card-body" style="padding:0">
+          ${renderOffersTable(city.offers_list)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Creatives -->
+    <div class="creatives-title">Top ${city.top_ads.length} criativos · ${city.city}</div>
+    <div class="creatives-grid">
+      ${city.top_ads.map((ad, i) => renderCreativeCard(ad, i + 1, city.city)).join('')}
+    </div>
+  `;
+
+  // Render chart after DOM is updated
+  renderOffersChart(city);
+
+  // Attach drag & drop handlers
+  attachDropHandlers();
+}
+
+// ──────────────────────────────────────────────
+// Offers Table
+// ──────────────────────────────────────────────
+
+function renderOffersTable(offers) {
+  if (!offers || offers.length === 0) {
+    return '<div class="empty-state">Sem dados de oferta</div>';
+  }
+
+  const rows = offers.map(o => {
+    const health = healthClass(o.cpa);
+    return `
+      <tr>
+        <td>
+          <span class="offer-badge" style="${offerBadgeStyle(o.offer)}">${o.offer}</span>
+        </td>
+        <td class="mono">${fmt.brl(o.spend)}</td>
+        <td class="mono">${fmt.num(o.conversations)}</td>
+        <td class="mono ${cpaColor(o.cpa)}">${o.cpa > 0 ? fmt.brl(o.cpa) : '—'}</td>
+        <td class="mono">${fmt.num(o.clicks)}</td>
+        <td><span class="health-badge ${health.cls}">${health.label}</span></td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <table class="offers-table">
+      <thead>
+        <tr>
+          <th>Oferta</th>
+          <th>Gasto</th>
+          <th>Conv.</th>
+          <th>CPA</th>
+          <th>Cliques</th>
+          <th>Saúde</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+// ──────────────────────────────────────────────
+// Offers Chart
+// ──────────────────────────────────────────────
+
+function renderOffersChart(city) {
+  if (offerChart) {
+    offerChart.destroy();
+    offerChart = null;
+  }
+
+  const offers = city.offers_list || [];
+  if (offers.length === 0) return;
+
+  const labels = offers.map(o => o.offer);
+  const spends = offers.map(o => o.spend);
+  const cpas   = offers.map(o => o.cpa);
+
+  const ctx = document.getElementById('offers-chart');
+  if (!ctx) return;
+
+  offerChart = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Investimento (R$)',
+          data: spends,
+          backgroundColor: labels.map(l => {
+            const c = (DASHBOARD_DATA.offer_colors[l] || DASHBOARD_DATA.offer_colors['OUTRO']);
+            return c.bg;
+          }),
+          borderColor: labels.map(l => {
+            const c = (DASHBOARD_DATA.offer_colors[l] || DASHBOARD_DATA.offer_colors['OUTRO']);
+            return c.text;
+          }),
+          borderWidth: 1.5,
+          borderRadius: 6,
+          yAxisID: 'y',
+        },
+        {
+          type: 'line',
+          label: 'CPA (R$)',
+          data: cpas,
+          borderColor: '#C8503C',
+          backgroundColor: 'rgba(200,80,60,.1)',
+          borderWidth: 2,
+          pointBackgroundColor: '#C8503C',
+          pointRadius: 4,
+          tension: 0.3,
+          yAxisID: 'y2',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            font: { family: 'Outfit', size: 11 },
+            color: '#5A5751',
+            boxWidth: 12,
+            padding: 16,
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1A1916',
+          titleFont: { family: 'Outfit', size: 12 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          padding: 12,
+          callbacks: {
+            label: ctx => {
+              const v = ctx.parsed.y;
+              return ctx.dataset.label + ': R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Outfit', size: 10 }, color: '#9B9690', maxRotation: 30 }
+        },
+        y: {
+          position: 'left',
+          grid: { color: '#E8E6DF' },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 10 },
+            color: '#9B9690',
+            callback: v => 'R$ ' + Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 0 })
+          }
+        },
+        y2: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 10 },
+            color: '#C8503C',
+            callback: v => 'R$ ' + Number(v).toFixed(2)
+          }
+        }
+      }
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+// Creative Cards
+// ──────────────────────────────────────────────
+
+function renderCreativeCard(ad, rank, city) {
+  const id = `${city}_${rank}`.replace(/[^a-zA-Z0-9_]/g, '_');
+  const rankClass = rank <= 3 ? ` rank-${rank}` : '';
+  const cpaCol = cpaColor(ad.cpa);
+
+  return `
+    <div class="creative-card">
+      <div class="drop-zone"
+           id="dz-${id}"
+           ondragover="dzDragOver(event)"
+           ondragleave="dzDragLeave(event, '${id}')"
+           ondrop="dzDrop(event, '${id}')">
+        <div class="rank-badge${rankClass}">${rank}</div>
+        <div class="drop-zone-hint">
+          <div class="drop-icon">+</div>
+          <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
+        </div>
+        <input type="file" accept="image/*" onchange="dzFileInput(event, '${id}')" title="Selecionar imagem"/>
+      </div>
+      <div class="creative-body">
+        <span class="offer-badge" style="${offerBadgeStyle(ad.offer)}">${ad.offer}</span>
+        <div class="creative-hook" title="${escHtml(ad.hook)}">${escHtml(ad.hook)}</div>
+        <div class="creative-metrics">
+          <div class="creative-metric">
+            <span class="creative-metric-label">Conversas</span>
+            <span class="creative-metric-value green font-mono">${fmt.num(ad.conversations)}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">CPA</span>
+            <span class="creative-metric-value ${cpaCol} font-mono">${ad.cpa > 0 ? fmt.brl(ad.cpa) : '—'}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">Gasto</span>
+            <span class="creative-metric-value font-mono">${fmt.brl(ad.spend)}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">CTR</span>
+            <span class="creative-metric-value font-mono">${fmt.pct(ad.ctr)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ──────────────────────────────────────────────
+// Drag & Drop for thumbnails
+// ──────────────────────────────────────────────
+
+function attachDropHandlers() {
+  // handlers are inline via ondragover/ondrop attributes
+}
+
+function dzDragOver(e) {
+  e.preventDefault();
+  const dz = e.currentTarget;
+  dz.classList.add('drag-over');
+}
+
+function dzDragLeave(e, id) {
+  const dz = document.getElementById('dz-' + id);
+  if (dz) dz.classList.remove('drag-over');
+}
+
+function dzDrop(e, id) {
+  e.preventDefault();
+  const dz = document.getElementById('dz-' + id);
+  if (dz) dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    loadImageIntoDZ(file, id);
+  }
+}
+
+function dzFileInput(e, id) {
+  const file = e.target.files[0];
+  if (file && file.type.startsWith('image/')) {
+    loadImageIntoDZ(file, id);
+  }
+}
+
+function loadImageIntoDZ(file, id) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dz = document.getElementById('dz-' + id);
+    if (!dz) return;
+    let img = dz.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = 'Thumbnail do criativo';
+      dz.appendChild(img);
+    }
+    img.src = e.target.result;
+    dz.classList.add('has-img');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ──────────────────────────────────────────────
+// Init
+// ──────────────────────────────────────────────
+
+function init() {
+  initHeaderFooter();
+  renderKPIs();
+  renderCitySelector();
+}
+
+init();
+</script>
+</body>
+</html>

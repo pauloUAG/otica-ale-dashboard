@@ -1,9 +1,8 @@
 # Credenciais — NUNCA commitar
 .env
 
-# Dados que são sobrescritos automaticamente (opcional: remova se quiser versionar)
+# Dados semanais (sobrescritos automaticamente)
 data/weekly_data.json
-output/dashboard.html
 
 # Histórico de dados (manter para comparações)
 # data/*.json
