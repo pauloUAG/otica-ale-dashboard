@@ -1,0 +1,26 @@
+# Credenciais — NUNCA commitar
+.env
+
+# Dados que são sobrescritos automaticamente (opcional: remova se quiser versionar)
+data/weekly_data.json
+output/dashboard.html
+
+# Histórico de dados (manter para comparações)
+# data/*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+*.egg
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

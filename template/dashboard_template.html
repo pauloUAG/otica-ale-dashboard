@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ótica Alê Eyewear — Dashboard Semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #FAFAF7;
+    --surface:    #FFFFFF;
+    --border:     #E8E6DF;
+    --border-2:   #D5D2CA;
+    --text-1:     #1A1916;
+    --text-2:     #5A5751;
+    --text-3:     #9B9690;
+    --teal:       #2B8C7E;
+    --teal-light: #EBF5F3;
+    --teal-mid:   #C2DED9;
+    --red:        #C8503C;
+    --red-light:  #FBF0EE;
+    --gold:       #B8860B;
+    --gold-light: #FDF6E3;
+    --radius:     14px;
+    --radius-sm:  8px;
+    --shadow:     0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+    --shadow-md:  0 2px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text-1);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Typography ── */
+  .font-display { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Layout ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-brand { display: flex; flex-direction: column; gap: 2px; }
+  .brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    color: var(--text-1);
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 400;
+    letter-spacing: .3px;
+  }
+  .header-period {
+    font-size: 13px;
+    color: var(--text-2);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-weight: 500;
+  }
+
+  /* ── Main Content ── */
+  .main { padding: 32px 0 64px; }
+
+  /* ── Section Label ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+
+  /* ── KPI Cards ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -.5px;
+    line-height: 1.2;
+  }
+  .kpi-value.accent { color: var(--teal); }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  /* ── City Selector ── */
+  .city-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .city-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: all .15s ease;
+    font-family: inherit;
+    min-width: 160px;
+    flex: 1;
+  }
+  .city-btn:hover {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .city-btn.active {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    box-shadow: 0 0 0 2px var(--teal-mid);
+  }
+  .city-btn-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: .2px;
+  }
+  .city-btn.active .city-btn-name { color: var(--teal); }
+  .city-btn-stats {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .city-btn-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-2);
+    font-size: 11px;
+  }
+
+  /* ── City Detail ── */
+  .city-detail { display: none; }
+  .city-detail.visible { display: block; }
+
+  /* ── Metrics Grid ── */
+  .metrics-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .metrics-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 768px) {
+    .metrics-grid-3, .metrics-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .metric-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .metric-value.green { color: var(--teal); }
+  .metric-value.red   { color: var(--red); }
+  .metric-value.gold  { color: var(--gold); }
+
+  /* ── Chart & Table Layout ── */
+  .chart-table-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 16px;
+    margin-bottom: 28px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .chart-table-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+  }
+  .card-body { padding: 20px; }
+
+  /* ── Offers Table ── */
+  .offers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .offers-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .offers-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .offers-table tr:last-child td { border-bottom: none; }
+  .offers-table td.mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .offers-table tr:hover td { background: var(--bg); }
+
+  /* ── Offer Badge ── */
+  .offer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+
+  /* ── Health Badge ── */
+  .health-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .health-otimo  { background: var(--teal-light); color: var(--teal); }
+  .health-ok     { background: var(--gold-light); color: var(--gold); }
+  .health-caro   { background: var(--red-light); color: var(--red); }
+
+  /* ── Top Creatives ── */
+  .creatives-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 16px;
+  }
+  .creatives-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 1200px) { .creatives-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px)  { .creatives-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px)  { .creatives-grid { grid-template-columns: 1fr; } }
+
+  .creative-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .15s, transform .15s;
+  }
+  .creative-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    aspect-ratio: 9/16;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background .15s;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    background: var(--teal-light);
+    border-color: var(--teal);
+  }
+  .drop-zone.has-img { background: #000; }
+  .drop-zone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+  .drop-zone-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .drop-zone.has-img .drop-zone-hint { display: none; }
+  .drop-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-3);
+    font-size: 16px;
+  }
+  .drop-text { font-size: 11px; color: var(--text-3); text-align: center; }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Rank badge */
+  .rank-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 26px;
+    height: 26px;
+    background: rgba(0,0,0,.65);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    z-index: 2;
+  }
+  .rank-1 { background: rgba(184,134,11,.9); }
+  .rank-2 { background: rgba(100,116,139,.9); }
+  .rank-3 { background: rgba(146,64,14,.85); }
+
+  /* Creative card body */
+  .creative-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .creative-hook {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-1);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .creative-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .creative-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .creative-metric-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .creative-metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .creative-metric-value.green { color: var(--teal); }
+  .creative-metric-value.red   { color: var(--red); }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--text-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     Header
+══════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="container header-inner">
+    <div class="header-brand">
+      <span class="brand-name">Ótica Alê <span class="font-display">Eyewear</span></span>
+      <span class="brand-sub">Dashboard Semanal · Meta Ads</span>
+    </div>
+    <span class="header-period" id="period-label">Carregando...</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     Main
+══════════════════════════════════════════════════ -->
+<main class="main">
+  <div class="container">
+
+    <!-- KPIs Gerais -->
+    <div class="section-label">Visão geral da semana</div>
+    <div class="kpi-grid" id="kpi-grid">
+      <!-- Injetado pelo JS -->
+    </div>
+
+    <!-- Seletor de cidades -->
+    <div class="section-label">Desempenho por cidade</div>
+    <div class="city-selector" id="city-selector">
+      <!-- Injetado pelo JS -->
+    </div>
+
+    <!-- Detalhes da cidade selecionada -->
+    <div id="city-detail-container">
+      <!-- Injetado pelo JS -->
+    </div>
+
+  </div><!-- /container -->
+</main>
+
+<!-- ══════════════════════════════════════════════════
+     Footer
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="container footer">
+    <span>Ótica Alê Eyewear · Relatório gerado em <span id="generated-at">—</span></span>
+    <span>Meta Marketing API · <span id="api-period">—</span></span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     Data injected by generate_dashboard.py
+══════════════════════════════════════════════════ -->
+<script>
+const DASHBOARD_DATA = __DASHBOARD_DATA__;
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     App JavaScript
+══════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────
+// Utilities
+// ──────────────────────────────────────────────
+
+const fmt = {
+  brl: v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  num: v => Number(v).toLocaleString('pt-BR'),
+  pct: v => (Number(v) * 100).toFixed(1) + '%',
+  dec: (v, d=2) => Number(v).toFixed(d),
+};
+
+function healthClass(cpa) {
+  if (cpa === 0) return { cls: 'health-ok', label: '—' };
+  if (cpa <= 5)  return { cls: 'health-otimo', label: 'Ótimo' };
+  if (cpa <= 7)  return { cls: 'health-ok', label: 'OK' };
+  return { cls: 'health-caro', label: 'Caro' };
+}
+
+function cpaColor(cpa) {
+  if (cpa === 0) return '';
+  if (cpa <= 5)  return 'green';
+  if (cpa <= 7)  return 'gold';
+  return 'red';
+}
+
+function offerBadgeStyle(offer) {
+  const colors = DASHBOARD_DATA.offer_colors;
+  const c = colors[offer] || colors['OUTRO'];
+  return `background:${c.bg};color:${c.text}`;
+}
+
+// ──────────────────────────────────────────────
+// Header & Footer
+// ──────────────────────────────────────────────
+
+function initHeaderFooter() {
+  document.getElementById('period-label').textContent = DASHBOARD_DATA.period_label;
+
+  const gen = DASHBOARD_DATA.generated_at;
+  if (gen) {
+    const d = new Date(gen);
+    document.getElementById('generated-at').textContent =
+      d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  const p = DASHBOARD_DATA.period;
+  document.getElementById('api-period').textContent = `${p.start} → ${p.end}`;
+}
+
+// ──────────────────────────────────────────────
+// KPI Cards
+// ──────────────────────────────────────────────
+
+function renderKPIs() {
+  const t = DASHBOARD_DATA.totals;
+  const kpis = [
+    {
+      label: 'Investimento',
+      value: fmt.brl(t.spend),
+      sub: `${t.active_ads} anúncios ativos`,
+      accent: false,
+    },
+    {
+      label: 'Conversas',
+      value: fmt.num(t.conversations),
+      sub: 'Mensagens iniciadas',
+      accent: true,
+    },
+    {
+      label: 'CPA Médio',
+      value: fmt.brl(t.cpa),
+      sub: 'Custo por conversa',
+      accent: false,
+    },
+    {
+      label: 'Alcance',
+      value: fmt.num(t.reach),
+      sub: 'Pessoas únicas',
+      accent: false,
+    },
+    {
+      label: 'Visitas ao Perfil',
+      value: fmt.num(t.profile_visits),
+      sub: 'Via anúncios',
+      accent: false,
+    },
+    {
+      label: 'Anúncios',
+      value: `${t.active_ads}/${t.ads_count}`,
+      sub: 'Ativos / Total',
+      accent: false,
+    },
+  ];
+
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value${k.accent ? ' accent' : ''} font-mono">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// City Selector
+// ──────────────────────────────────────────────
+
+let activeCity = null;
+let offerChart = null;
+
+function renderCitySelector() {
+  const cities = DASHBOARD_DATA.cities;
+  const container = document.getElementById('city-selector');
+
+  container.innerHTML = cities.map((c, i) => `
+    <button class="city-btn${i === 0 ? ' active' : ''}"
+            onclick="selectCity('${c.city}')"
+            id="citybtn-${c.city}">
+      <span class="city-btn-name">${c.city}</span>
+      <span class="city-btn-stats">
+        <span>${c.conversations} conv.</span>
+        <span>·</span>
+        <span class="city-btn-stat-val">${fmt.brl(c.cpa)}</span>
+      </span>
+    </button>
+  `).join('');
+
+  if (cities.length > 0) {
+    selectCity(cities[0].city);
+  }
+}
+
+function selectCity(cityName) {
+  // Update button states
+  document.querySelectorAll('.city-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('citybtn-' + cityName);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  activeCity = cityName;
+  const cityData = DASHBOARD_DATA.cities.find(c => c.city === cityName);
+  if (!cityData) return;
+
+  renderCityDetail(cityData);
+}
+
+// ──────────────────────────────────────────────
+// City Detail
+// ──────────────────────────────────────────────
+
+function renderCityDetail(city) {
+  const container = document.getElementById('city-detail-container');
+  const cpaColorClass = cpaColor(city.cpa);
+
+  container.innerHTML = `
+    <!-- City Metrics -->
+    <div class="metrics-grid-3">
+      <div class="metric-card">
+        <div class="metric-label">Investimento</div>
+        <div class="metric-value font-mono">${fmt.brl(city.spend)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Conversas</div>
+        <div class="metric-value font-mono green">${fmt.num(city.conversations)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">CPA</div>
+        <div class="metric-value font-mono ${cpaColorClass}">${fmt.brl(city.cpa)}</div>
+      </div>
+    </div>
+    <div class="metrics-grid-4">
+      <div class="metric-card">
+        <div class="metric-label">Alcance</div>
+        <div class="metric-value font-mono">${fmt.num(city.reach)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Impressões</div>
+        <div class="metric-value font-mono">${fmt.num(city.impressions)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Cliques</div>
+        <div class="metric-value font-mono">${fmt.num(city.clicks)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Anúncios ativos</div>
+        <div class="metric-value font-mono">${city.active_ads}</div>
+      </div>
+    </div>
+
+    <!-- Chart + Table -->
+    <div class="chart-table-grid">
+      <div class="card">
+        <div class="card-header">Investimento e CPA por oferta</div>
+        <div class="card-body">
+          <canvas id="offers-chart" height="260"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">Ofertas</div>
+        <div class="card-body" style="padding:0">
+          ${renderOffersTable(city.offers_list)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Creatives -->
+    <div class="creatives-title">Top ${city.top_ads.length} criativos · ${city.city}</div>
+    <div class="creatives-grid">
+      ${city.top_ads.map((ad, i) => renderCreativeCard(ad, i + 1, city.city)).join('')}
+    </div>
+  `;
+
+  // Render chart after DOM is updated
+  renderOffersChart(city);
+
+  // Attach drag & drop handlers
+  attachDropHandlers();
+}
+
+// ──────────────────────────────────────────────
+// Offers Table
+// ──────────────────────────────────────────────
+
+function renderOffersTable(offers) {
+  if (!offers || offers.length === 0) {
+    return '<div class="empty-state">Sem dados de oferta</div>';
+  }
+
+  const rows = offers.map(o => {
+    const health = healthClass(o.cpa);
+    return `
+      <tr>
+        <td>
+          <span class="offer-badge" style="${offerBadgeStyle(o.offer)}">${o.offer}</span>
+        </td>
+        <td class="mono">${fmt.brl(o.spend)}</td>
+        <td class="mono">${fmt.num(o.conversations)}</td>
+        <td class="mono ${cpaColor(o.cpa)}">${o.cpa > 0 ? fmt.brl(o.cpa) : '—'}</td>
+        <td class="mono">${fmt.num(o.clicks)}</td>
+        <td><span class="health-badge ${health.cls}">${health.label}</span></td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <table class="offers-table">
+      <thead>
+        <tr>
+          <th>Oferta</th>
+          <th>Gasto</th>
+          <th>Conv.</th>
+          <th>CPA</th>
+          <th>Cliques</th>
+          <th>Saúde</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+// ──────────────────────────────────────────────
+// Offers Chart
+// ──────────────────────────────────────────────
+
+function renderOffersChart(city) {
+  if (offerChart) {
+    offerChart.destroy();
+    offerChart = null;
+  }
+
+  const offers = city.offers_list || [];
+  if (offers.length === 0) return;
+
+  const labels = offers.map(o => o.offer);
+  const spends = offers.map(o => o.spend);
+  const cpas   = offers.map(o => o.cpa);
+
+  const ctx = document.getElementById('offers-chart');
+  if (!ctx) return;
+
+  offerChart = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Investimento (R$)',
+          data: spends,
+          backgroundColor: labels.map(l => {
+            const c = (DASHBOARD_DATA.offer_colors[l] || DASHBOARD_DATA.offer_colors['OUTRO']);
+            return c.bg;
+          }),
+          borderColor: labels.map(l => {
+            const c = (DASHBOARD_DATA.offer_colors[l] || DASHBOARD_DATA.offer_colors['OUTRO']);
+            return c.text;
+          }),
+          borderWidth: 1.5,
+          borderRadius: 6,
+          yAxisID: 'y',
+        },
+        {
+          type: 'line',
+          label: 'CPA (R$)',
+          data: cpas,
+          borderColor: '#C8503C',
+          backgroundColor: 'rgba(200,80,60,.1)',
+          borderWidth: 2,
+          pointBackgroundColor: '#C8503C',
+          pointRadius: 4,
+          tension: 0.3,
+          yAxisID: 'y2',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            font: { family: 'Outfit', size: 11 },
+            color: '#5A5751',
+            boxWidth: 12,
+            padding: 16,
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1A1916',
+          titleFont: { family: 'Outfit', size: 12 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          padding: 12,
+          callbacks: {
+            label: ctx => {
+              const v = ctx.parsed.y;
+              return ctx.dataset.label + ': R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Outfit', size: 10 }, color: '#9B9690', maxRotation: 30 }
+        },
+        y: {
+          position: 'left',
+          grid: { color: '#E8E6DF' },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 10 },
+            color: '#9B9690',
+            callback: v => 'R$ ' + Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 0 })
+          }
+        },
+        y2: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 10 },
+            color: '#C8503C',
+            callback: v => 'R$ ' + Number(v).toFixed(2)
+          }
+        }
+      }
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+// Creative Cards
+// ──────────────────────────────────────────────
+
+function renderCreativeCard(ad, rank, city) {
+  const id = `${city}_${rank}`.replace(/[^a-zA-Z0-9_]/g, '_');
+  const rankClass = rank <= 3 ? ` rank-${rank}` : '';
+  const cpaCol = cpaColor(ad.cpa);
+
+  return `
+    <div class="creative-card">
+      <div class="drop-zone"
+           id="dz-${id}"
+           ondragover="dzDragOver(event)"
+           ondragleave="dzDragLeave(event, '${id}')"
+           ondrop="dzDrop(event, '${id}')">
+        <div class="rank-badge${rankClass}">${rank}</div>
+        <div class="drop-zone-hint">
+          <div class="drop-icon">+</div>
+          <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
+        </div>
+        <input type="file" accept="image/*" onchange="dzFileInput(event, '${id}')" title="Selecionar imagem"/>
+      </div>
+      <div class="creative-body">
+        <span class="offer-badge" style="${offerBadgeStyle(ad.offer)}">${ad.offer}</span>
+        <div class="creative-hook" title="${escHtml(ad.hook)}">${escHtml(ad.hook)}</div>
+        <div class="creative-metrics">
+          <div class="creative-metric">
+            <span class="creative-metric-label">Conversas</span>
+            <span class="creative-metric-value green font-mono">${fmt.num(ad.conversations)}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">CPA</span>
+            <span class="creative-metric-value ${cpaCol} font-mono">${ad.cpa > 0 ? fmt.brl(ad.cpa) : '—'}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">Gasto</span>
+            <span class="creative-metric-value font-mono">${fmt.brl(ad.spend)}</span>
+          </div>
+          <div class="creative-metric">
+            <span class="creative-metric-label">CTR</span>
+            <span class="creative-metric-value font-mono">${fmt.pct(ad.ctr)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ──────────────────────────────────────────────
+// Drag & Drop for thumbnails
+// ──────────────────────────────────────────────
+
+function attachDropHandlers() {
+  // handlers are inline via ondragover/ondrop attributes
+}
+
+function dzDragOver(e) {
+  e.preventDefault();
+  const dz = e.currentTarget;
+  dz.classList.add('drag-over');
+}
+
+function dzDragLeave(e, id) {
+  const dz = document.getElementById('dz-' + id);
+  if (dz) dz.classList.remove('drag-over');
+}
+
+function dzDrop(e, id) {
+  e.preventDefault();
+  const dz = document.getElementById('dz-' + id);
+  if (dz) dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    loadImageIntoDZ(file, id);
+  }
+}
+
+function dzFileInput(e, id) {
+  const file = e.target.files[0];
+  if (file && file.type.startsWith('image/')) {
+    loadImageIntoDZ(file, id);
+  }
+}
+
+function loadImageIntoDZ(file, id) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dz = document.getElementById('dz-' + id);
+    if (!dz) return;
+    let img = dz.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = 'Thumbnail do criativo';
+      dz.appendChild(img);
+    }
+    img.src = e.target.result;
+    dz.classList.add('has-img');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ──────────────────────────────────────────────
+// Init
+// ──────────────────────────────────────────────
+
+function init() {
+  initHeaderFooter();
+  renderKPIs();
+  renderCitySelector();
+}
+
+init();
+</script>
+</body>
+</html>

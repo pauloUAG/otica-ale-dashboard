@@ -1,0 +1,61 @@
+name: Atualizar Dashboard Meta Ads
+
+on:
+  schedule:
+    # Segunda-feira às 11h UTC = 8h BRT (Horário de Brasília = UTC-3)
+    - cron: '0 11 * * 1'
+  # Permite rodar manualmente pelo GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      data_inicio:
+        description: 'Data início (YYYY-MM-DD) — deixe em branco para semana anterior automática'
+        required: false
+        default: ''
+      data_fim:
+        description: 'Data fim (YYYY-MM-DD) — deixe em branco para semana anterior automática'
+        required: false
+        default: ''
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: otica-ale-dashboard
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: otica-ale-dashboard/requirements.txt
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Coletar dados da API do Meta
+        run: |
+          if [ -n "${{ github.event.inputs.data_inicio }}" ] && [ -n "${{ github.event.inputs.data_fim }}" ]; then
+            python fetch_meta_data.py "${{ github.event.inputs.data_inicio }}" "${{ github.event.inputs.data_fim }}"
+          else
+            python fetch_meta_data.py
+          fi
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
+          META_API_VERSION: v22.0
+
+      - name: Gerar dashboard HTML
+        run: python generate_dashboard.py
+
+      - name: Commit e push dos arquivos gerados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ output/
+          git diff --staged --quiet || git commit -m "Dashboard atualizado — $(date +'%d/%m/%Y')"
+          git push
