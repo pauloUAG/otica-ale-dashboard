@@ -88,6 +88,82 @@
     font-weight: 500;
   }
 
+  /* ── Period Selector ── */
+  .period-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow);
+  }
+  .period-bar label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    white-space: nowrap;
+  }
+  .period-bar input[type="date"] {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-1);
+    background: var(--bg);
+    cursor: pointer;
+  }
+  .period-bar input[type="date"]:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+  }
+  .period-sep { color: var(--text-3); font-size: 13px; }
+  .period-btn {
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .period-btn:hover { background: #236f63; }
+  .period-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+  .preset-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .preset-btn:hover, .preset-btn.active {
+    background: var(--teal-light);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .period-bar.hidden { display: none; }
+
   /* ── Main Content ── */
   .main { padding: 32px 0 64px; }
 
@@ -525,6 +601,22 @@
 <main class="main">
   <div class="container">
 
+    <!-- Seletor de período (só aparece se tiver histórico diário) -->
+    <div class="period-bar hidden" id="period-bar">
+      <label>Período</label>
+      <input type="date" id="date-start"/>
+      <span class="period-sep">→</span>
+      <input type="date" id="date-end"/>
+      <button class="period-btn" onclick="applyPeriod()">Aplicar</button>
+      <div class="period-presets">
+        <button class="preset-btn" onclick="setPreset(7)">7 dias</button>
+        <button class="preset-btn" onclick="setPreset(14)">14 dias</button>
+        <button class="preset-btn" onclick="setPreset(30)">30 dias</button>
+        <button class="preset-btn" onclick="setPreset(90)">90 dias</button>
+        <button class="preset-btn" onclick="setPreset(0)">Tudo</button>
+      </div>
+    </div>
+
     <!-- KPIs Gerais -->
     <div class="section-label">Visão geral da semana</div>
     <div class="kpi-grid" id="kpi-grid">
@@ -560,6 +652,7 @@
 ══════════════════════════════════════════════════ -->
 <script>
 const DASHBOARD_DATA = __DASHBOARD_DATA__;
+const HISTORY_DATA   = __HISTORY_DATA__;
 </script>
 
 <!-- ══════════════════════════════════════════════════
@@ -619,55 +712,26 @@ function initHeaderFooter() {
 // KPI Cards
 // ──────────────────────────────────────────────
 
-function renderKPIs() {
-  const t = DASHBOARD_DATA.totals;
+function renderKPIsFromTotals(t) {
   const kpis = [
-    {
-      label: 'Investimento',
-      value: fmt.brl(t.spend),
-      sub: `${t.active_ads} anúncios ativos`,
-      accent: false,
-    },
-    {
-      label: 'Conversas',
-      value: fmt.num(t.conversations),
-      sub: 'Mensagens iniciadas',
-      accent: true,
-    },
-    {
-      label: 'CPA Médio',
-      value: fmt.brl(t.cpa),
-      sub: 'Custo por conversa',
-      accent: false,
-    },
-    {
-      label: 'Alcance',
-      value: fmt.num(t.reach),
-      sub: 'Pessoas únicas',
-      accent: false,
-    },
-    {
-      label: 'Visitas ao Perfil',
-      value: fmt.num(t.profile_visits),
-      sub: 'Via anúncios',
-      accent: false,
-    },
-    {
-      label: 'Anúncios',
-      value: `${t.active_ads}/${t.ads_count}`,
-      sub: 'Ativos / Total',
-      accent: false,
-    },
+    { label: 'Investimento',    value: fmt.brl(t.spend),            sub: `${t.active_ads} anúncios ativos`, accent: false },
+    { label: 'Conversas',       value: fmt.num(t.conversations),     sub: 'Mensagens iniciadas',             accent: true  },
+    { label: 'CPA Médio',       value: fmt.brl(t.cpa),              sub: 'Custo por conversa',              accent: false },
+    { label: 'Alcance',         value: fmt.num(t.reach),             sub: 'Pessoas únicas',                  accent: false },
+    { label: 'Visitas ao Perfil', value: fmt.num(t.profile_visits),  sub: 'Via anúncios',                    accent: false },
+    { label: 'Anúncios',        value: `${t.active_ads}/${t.ads_count}`, sub: 'Ativos / Total',             accent: false },
   ];
-
-  const grid = document.getElementById('kpi-grid');
-  grid.innerHTML = kpis.map(k => `
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
     <div class="kpi-card">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-value${k.accent ? ' accent' : ''} font-mono">${k.value}</div>
       <div class="kpi-sub">${k.sub}</div>
     </div>
   `).join('');
+}
+
+function renderKPIs() {
+  renderKPIsFromTotals(DASHBOARD_DATA.totals);
 }
 
 // ──────────────────────────────────────────────
@@ -677,13 +741,11 @@ function renderKPIs() {
 let activeCity = null;
 let offerChart = null;
 
-function renderCitySelector() {
-  const cities = DASHBOARD_DATA.cities;
+function renderCitySelectorFromList(cities) {
   const container = document.getElementById('city-selector');
-
   container.innerHTML = cities.map((c, i) => `
     <button class="city-btn${i === 0 ? ' active' : ''}"
-            onclick="selectCity('${c.city}')"
+            onclick="selectCityFromList('${c.city}', currentCities)"
             id="citybtn-${c.city}">
       <span class="city-btn-name">${c.city}</span>
       <span class="city-btn-stats">
@@ -693,23 +755,27 @@ function renderCitySelector() {
       </span>
     </button>
   `).join('');
-
-  if (cities.length > 0) {
-    selectCity(cities[0].city);
-  }
+  currentCities = cities;
+  if (cities.length > 0) selectCityFromList(cities[0].city, cities);
 }
 
-function selectCity(cityName) {
-  // Update button states
+let currentCities = DASHBOARD_DATA.cities;
+
+function renderCitySelector() {
+  renderCitySelectorFromList(DASHBOARD_DATA.cities);
+}
+
+function selectCityFromList(cityName, cities) {
   document.querySelectorAll('.city-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById('citybtn-' + cityName);
   if (activeBtn) activeBtn.classList.add('active');
-
   activeCity = cityName;
-  const cityData = DASHBOARD_DATA.cities.find(c => c.city === cityName);
-  if (!cityData) return;
+  const cityData = cities.find(c => c.city === cityName);
+  if (cityData) renderCityDetail(cityData);
+}
 
-  renderCityDetail(cityData);
+function selectCity(cityName) {
+  selectCityFromList(cityName, currentCities);
 }
 
 // ──────────────────────────────────────────────
@@ -1048,11 +1114,171 @@ function loadImageIntoDZ(file, id) {
 }
 
 // ──────────────────────────────────────────────
+// Period selector (history mode)
+// ──────────────────────────────────────────────
+
+let currentAds = DASHBOARD_DATA.cities.flatMap(c => c.ads || []);
+
+function initPeriodBar() {
+  if (!DASHBOARD_DATA.has_history || !HISTORY_DATA || !HISTORY_DATA.records) return;
+
+  const bar = document.getElementById('period-bar');
+  bar.classList.remove('hidden');
+
+  const records = HISTORY_DATA.records;
+  const dates = records.map(r => r.date).filter(Boolean).sort();
+  const minDate = dates[0] || '';
+  const maxDate = dates[dates.length - 1] || '';
+
+  const startEl = document.getElementById('date-start');
+  const endEl   = document.getElementById('date-end');
+  startEl.min = minDate; startEl.max = maxDate;
+  endEl.min   = minDate; endEl.max   = maxDate;
+  startEl.value = minDate;
+  endEl.value   = maxDate;
+}
+
+function setPreset(days) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const records = HISTORY_DATA && HISTORY_DATA.records ? HISTORY_DATA.records : [];
+  const dates = records.map(r => r.date).filter(Boolean).sort();
+  if (!dates.length) return;
+
+  const endDate = dates[dates.length - 1];
+  let startDate;
+  if (days === 0) {
+    startDate = dates[0];
+  } else {
+    const end = new Date(endDate);
+    const start = new Date(end);
+    start.setDate(end.getDate() - days + 1);
+    startDate = start.toISOString().slice(0, 10);
+    if (startDate < dates[0]) startDate = dates[0];
+  }
+
+  document.getElementById('date-start').value = startDate;
+  document.getElementById('date-end').value   = endDate;
+  applyPeriod();
+}
+
+function applyPeriod() {
+  if (!HISTORY_DATA || !HISTORY_DATA.records) return;
+
+  const start = document.getElementById('date-start').value;
+  const end   = document.getElementById('date-end').value;
+  if (!start || !end) return;
+
+  // Filtra registros pelo período
+  const filtered = HISTORY_DATA.records.filter(r => r.date >= start && r.date <= end);
+
+  // Agrega por ad_name
+  const agg = {};
+  for (const r of filtered) {
+    const key = r.name;
+    if (!agg[key]) {
+      agg[key] = { ...r, _ctr_sum: r.ctr || 0, _ctr_n: r.ctr ? 1 : 0 };
+    } else {
+      const d = agg[key];
+      d.spend          += r.spend;
+      d.conversations  += r.conversations;
+      d.clicks         += r.clicks;
+      d.reach          += r.reach;
+      d.impressions    += r.impressions;
+      d.profile_visits += r.profile_visits;
+      d._ctr_sum       += r.ctr || 0;
+      d._ctr_n         += r.ctr ? 1 : 0;
+      if (r.status === 'ATIVO') d.status = 'ATIVO';
+    }
+  }
+
+  currentAds = Object.values(agg).map(d => ({
+    ...d,
+    ctr: d._ctr_n ? +(d._ctr_sum / d._ctr_n).toFixed(4) : 0,
+    cpa: d.conversations ? +(d.spend / d.conversations).toFixed(2) : 0,
+  }));
+
+  // Atualiza período exibido
+  document.getElementById('period-label').textContent = formatDateBR(start) + ' \u2014 ' + formatDateBR(end);
+
+  // Re-renderiza tudo
+  renderKPIsFromAds(currentAds);
+  renderCitySelectorFromAds(currentAds);
+}
+
+function formatDateBR(dateStr) {
+  const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const d = new Date(dateStr + 'T12:00:00');
+  return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function groupByCity(ads) {
+  const CITY_ORDER = ['BELÉM','ANANINDEUA','CASTANHAL','CAPANEMA','MARITUBA'];
+  const cityMap = {};
+  for (const ad of ads) {
+    const city = ad.city;
+    if (!cityMap[city]) {
+      cityMap[city] = { city, spend: 0, conversations: 0, clicks: 0,
+                        reach: 0, impressions: 0, profile_visits: 0,
+                        ads: [], offers: {} };
+    }
+    const d = cityMap[city];
+    d.spend += ad.spend; d.conversations += ad.conversations;
+    d.clicks += ad.clicks; d.reach += ad.reach;
+    d.impressions += ad.impressions; d.profile_visits += ad.profile_visits;
+    d.ads.push(ad);
+
+    const offer = ad.offer;
+    if (!d.offers[offer]) d.offers[offer] = { offer, spend: 0, conversations: 0, clicks: 0,
+                                               colors: DASHBOARD_DATA.offer_colors[offer] || DASHBOARD_DATA.offer_colors['OUTRO'] };
+    d.offers[offer].spend += ad.spend;
+    d.offers[offer].conversations += ad.conversations;
+    d.offers[offer].clicks += ad.clicks;
+  }
+
+  for (const d of Object.values(cityMap)) {
+    d.cpa = d.conversations ? +(d.spend / d.conversations).toFixed(2) : 0;
+    d.active_ads = d.ads.filter(a => a.spend > 0).length;
+    d.top_ads = [...d.ads].sort((a,b) => b.conversations - a.conversations).slice(0, 5);
+    const ol = Object.values(d.offers).map(o => ({
+      ...o, cpa: o.conversations ? +(o.spend / o.conversations).toFixed(2) : 0
+    }));
+    d.offers_list = ol.sort((a,b) => b.conversations - a.conversations);
+  }
+
+  const ordered = [];
+  for (const city of CITY_ORDER) if (cityMap[city]) ordered.push(cityMap[city]);
+  for (const [city, data] of Object.entries(cityMap)) if (!CITY_ORDER.includes(city)) ordered.push(data);
+  return ordered;
+}
+
+function renderKPIsFromAds(ads) {
+  const sp = ads.reduce((s,a) => s + a.spend, 0);
+  const cv = ads.reduce((s,a) => s + a.conversations, 0);
+  const t = {
+    spend: sp, conversations: cv,
+    cpa: cv ? +(sp/cv).toFixed(2) : 0,
+    reach: ads.reduce((s,a) => s + a.reach, 0),
+    profile_visits: ads.reduce((s,a) => s + a.profile_visits, 0),
+    ads_count: ads.length,
+    active_ads: ads.filter(a => a.spend > 0).length,
+  };
+  renderKPIsFromTotals(t);
+}
+
+function renderCitySelectorFromAds(ads) {
+  const cities = groupByCity(ads);
+  renderCitySelectorFromList(cities);
+}
+
+// ──────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────
 
 function init() {
   initHeaderFooter();
+  initPeriodBar();
   renderKPIs();
   renderCitySelector();
 }
