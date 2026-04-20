@@ -107,7 +107,7 @@ def extract_hook(ad_name: str) -> str:
 # Meta API
 # ---------------------------------------------------------------------------
 
-def fetch_all_insights(since: str, until: str) -> list[dict]:
+def fetch_all_insights(since: str, until: str, time_increment: int | None = None) -> list[dict]:
     """Busca todos os insights a nível de anúncio com paginação."""
     if not ACCESS_TOKEN or not AD_ACCOUNT_ID:
         print("ERRO: META_ACCESS_TOKEN e META_AD_ACCOUNT_ID precisam estar no .env", file=sys.stderr)
@@ -143,6 +143,8 @@ def fetch_all_insights(since: str, until: str) -> list[dict]:
         "limit": 500,
         "access_token": ACCESS_TOKEN,
     }
+    if time_increment:
+        params["time_increment"] = str(time_increment)
 
     all_data = []
     page = 1
@@ -271,6 +273,39 @@ def build_totals(ads: list[dict]) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# History update
+# ---------------------------------------------------------------------------
+
+def update_history_json(since: str, until: str, daily_ads: list[dict]):
+    """Acrescenta registros diários ao history.json, evitando duplicatas."""
+    from pathlib import Path
+    history_path = "data/history.json"
+    if Path(history_path).exists():
+        with open(history_path, encoding="utf-8") as f:
+            history = json.load(f)
+    else:
+        history = {"last_updated": "", "period": {"start": since, "end": until}, "records": []}
+
+    # Remove registros existentes para o período (evita duplicatas em re-runs)
+    history["records"] = [r for r in history["records"] if not (since <= r.get("date", "") <= until)]
+
+    history["records"].extend(daily_ads)
+    history["records"].sort(key=lambda r: r.get("date", ""))
+
+    all_dates = [r["date"] for r in history["records"] if r.get("date")]
+    if all_dates:
+        history["period"]["start"] = min(all_dates)
+        history["period"]["end"]   = max(all_dates)
+
+    history["last_updated"] = datetime.now().isoformat()
+
+    with open(history_path, "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+
+    print(f"✓ history.json atualizado: {len(daily_ads)} registros de {since} a {until}")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -328,6 +363,19 @@ def main():
     print(f"  Investimento total:   R$ {totals['spend']:,.2f}")
     print(f"  Conversas:            {totals['conversations']}")
     print(f"  CPA médio:            R$ {totals['cpa']:,.2f}")
+
+    # Buscar dados diários e atualizar history.json
+    print("\nBuscando dados diários para o histórico (time_increment=1)...")
+    raw_daily = fetch_all_insights(since, until, time_increment=1)
+    daily_ads = []
+    for row in raw_daily:
+        date = row.get("date_start", "")
+        ad = process_row(row)
+        if ad["spend"] > 0 and date:
+            ad["date"] = date
+            daily_ads.append(ad)
+    update_history_json(since, until, daily_ads)
+
     print(f"\nPróximo passo: python generate_dashboard.py")
 
 
