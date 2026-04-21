@@ -183,18 +183,9 @@ def get_action_value(actions: list[dict] | None, action_type: str) -> float:
 
 
 def extract_conversations(row: dict) -> int:
-    """Extrai contagem de conversas por mensagem iniciada."""
+    """Extrai 'Conversas por mensagem iniciadas' — mesma métrica do Meta Ads Manager."""
     actions = row.get("actions") or []
-    # Tenta o action type principal de conversas via WhatsApp/Messenger
-    for action_type in [
-        "onsite_conversion.messaging_conversation_started_7d",
-        "onsite_conversion.total_messaging_connection",
-        "onsite_conversion.messaging_first_reply",
-    ]:
-        val = get_action_value(actions, action_type)
-        if val > 0:
-            return int(val)
-    return 0
+    return int(get_action_value(actions, "onsite_conversion.messaging_conversation_started_7d"))
 
 
 def process_row(row: dict) -> dict:
