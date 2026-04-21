@@ -355,17 +355,25 @@ def main():
     print(f"  Conversas:            {totals['conversations']}")
     print(f"  CPA médio:            R$ {totals['cpa']:,.2f}")
 
-    # Buscar dados diários e atualizar history.json
-    print("\nBuscando dados diários para o histórico (time_increment=1)...")
-    raw_daily = fetch_all_insights(since, until, time_increment=1)
-    daily_ads = []
-    for row in raw_daily:
-        date = row.get("date_start", "")
-        ad = process_row(row)
-        if ad["spend"] > 0 and date:
-            ad["date"] = date
-            daily_ads.append(ad)
-    update_history_json(since, until, daily_ads)
+    # Buscar dados diários em blocos de 30 dias e atualizar history.json
+    print("\nBuscando dados diários para o histórico (blocos de 30 dias)...")
+    chunk_start = date.fromisoformat(since)
+    chunk_end_limit = date.fromisoformat(until)
+    all_daily_ads = []
+    while chunk_start <= chunk_end_limit:
+        chunk_end = min(chunk_start + timedelta(days=29), chunk_end_limit)
+        cs = chunk_start.strftime("%Y-%m-%d")
+        ce = chunk_end.strftime("%Y-%m-%d")
+        print(f"  Bloco: {cs} a {ce}")
+        raw_daily = fetch_all_insights(cs, ce, time_increment=1)
+        for row in raw_daily:
+            d = row.get("date_start", "")
+            ad = process_row(row)
+            if ad["spend"] > 0 and d:
+                ad["date"] = d
+                all_daily_ads.append(ad)
+        chunk_start = chunk_end + timedelta(days=1)
+    update_history_json(since, until, all_daily_ads)
 
     print(f"\nPróximo passo: python generate_dashboard.py")
 
