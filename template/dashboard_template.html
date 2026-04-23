@@ -1134,8 +1134,15 @@ function initPeriodBar() {
   const endEl   = document.getElementById('date-end');
   startEl.min = minDate; startEl.max = maxDate;
   endEl.min   = minDate; endEl.max   = maxDate;
-  startEl.value = minDate;
+
+  const maxDateObj = new Date(maxDate + 'T12:00:00');
+  const defaultStart = new Date(maxDateObj);
+  defaultStart.setDate(defaultStart.getDate() - 6);
+  const defaultStartStr = defaultStart.toISOString().slice(0, 10);
+  startEl.value = defaultStartStr < minDate ? minDate : defaultStartStr;
   endEl.value   = maxDate;
+
+  applyPeriod();
 }
 
 function setPreset(days) {

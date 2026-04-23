@@ -28,14 +28,10 @@ GRAPH_BASE = f"https://graph.facebook.com/{API_VERSION}"
 # Date helpers
 # ---------------------------------------------------------------------------
 
-def get_last_week_range() -> tuple[date, date]:
-    """Retorna (segunda-feira, domingo) da semana anterior."""
-    today = date.today()
-    # Dia da semana: Monday=0, Sunday=6
-    days_since_monday = today.weekday()
-    last_monday = today - timedelta(days=days_since_monday + 7)
-    last_sunday = last_monday + timedelta(days=6)
-    return last_monday, last_sunday
+def get_yesterday_range() -> tuple[date, date]:
+    """Retorna (ontem, ontem) para busca diária automática."""
+    yesterday = date.today() - timedelta(days=1)
+    return yesterday, yesterday
 
 
 # ---------------------------------------------------------------------------
@@ -305,9 +301,9 @@ def main():
     print("Ótica Alê Eyewear — Coleta de Dados Meta Ads")
     print("=" * 60)
 
-    last_monday, last_sunday = get_last_week_range()
-    since = last_monday.strftime("%Y-%m-%d")
-    until = last_sunday.strftime("%Y-%m-%d")
+    yesterday, _ = get_yesterday_range()
+    since = yesterday.strftime("%Y-%m-%d")
+    until = yesterday.strftime("%Y-%m-%d")
 
     # Permite override via argumentos
     if len(sys.argv) == 3:

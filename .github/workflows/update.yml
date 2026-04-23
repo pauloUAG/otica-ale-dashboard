@@ -2,8 +2,8 @@ name: Atualizar Dashboard Meta Ads
 
 on:
   schedule:
-    # Segunda-feira às 11h UTC = 8h BRT (Horário de Brasília = UTC-3)
-    - cron: '0 11 * * 1'
+    # Todo dia às 11h UTC = 8h BRT (Horário de Brasília = UTC-3)
+    - cron: '0 11 * * *'
   # Permite rodar manualmente pelo GitHub Actions UI
   workflow_dispatch:
     inputs:
