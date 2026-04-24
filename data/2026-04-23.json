@@ -3,16 +3,15 @@
     "start": "2026-04-23",
     "end": "2026-04-23"
   },
-  "generated_at": "2026-04-24T03:02:29.451909",
-  "ad_account_id": "183011043700866",
+  "generated_at": "2026-04-24T03:08:16.621967",
   "totals": {
-    "spend": 277.64,
+    "spend": 277.84,
     "conversations": 39,
     "cpa": 7.12,
-    "reach": 21488,
-    "impressions": 32465,
+    "reach": 21540,
+    "impressions": 32495,
     "clicks": 233,
-    "profile_visits": 4148,
+    "profile_visits": 4159,
     "ads_count": 28,
     "active_ads": 28
   },
@@ -31,7 +30,7 @@
       "ctr": 0.0162,
       "reach": 1134,
       "impressions": 1485,
-      "profile_visits": 235
+      "profile_visits": 236
     },
     {
       "name": "Ad 00 - REELS - R$1,00 - BELÉM - COMO QUE UMA ARMAÇÃO",
@@ -79,7 +78,7 @@
       "ctr": 0.9575,
       "reach": 1330,
       "impressions": 1671,
-      "profile_visits": 223
+      "profile_visits": 225
     },
     {
       "name": "Ad 01 - REELS - EXAME DE VISTA - BELÉM",
@@ -104,13 +103,13 @@
       "offer": "R$ 1,00",
       "hook": "VALOR MEGA ACESSÍVEL",
       "status": "ATIVO",
-      "spend": 19.74,
+      "spend": 19.77,
       "conversations": 4,
-      "cpa": 4.93,
+      "cpa": 4.94,
       "clicks": 23,
-      "ctr": 0.9048,
-      "reach": 2077,
-      "impressions": 2542,
+      "ctr": 0.9041,
+      "reach": 2080,
+      "impressions": 2544,
       "profile_visits": 291
     },
     {
@@ -125,9 +124,9 @@
       "cpa": 8.94,
       "clicks": 16,
       "ctr": 0.8312,
-      "reach": 1704,
+      "reach": 1711,
       "impressions": 1925,
-      "profile_visits": 377
+      "profile_visits": 378
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL - CASTANHAL",
@@ -141,7 +140,7 @@
       "cpa": 10.93,
       "clicks": 6,
       "ctr": 0.7344,
-      "reach": 627,
+      "reach": 630,
       "impressions": 817,
       "profile_visits": 119
     },
@@ -156,9 +155,9 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 4,
-      "ctr": 0.4695,
-      "reach": 741,
-      "impressions": 852,
+      "ctr": 0.4689,
+      "reach": 743,
+      "impressions": 853,
       "profile_visits": 203
     },
     {
@@ -188,9 +187,9 @@
       "conversations": 6,
       "cpa": 3.11,
       "clicks": 13,
-      "ctr": 0.0145,
+      "ctr": 0.0144,
       "reach": 816,
-      "impressions": 899,
+      "impressions": 900,
       "profile_visits": 259
     },
     {
@@ -216,13 +215,13 @@
       "offer": "EM DOBRO",
       "hook": "DOBRO",
       "status": "ATIVO",
-      "spend": 18.9,
+      "spend": 18.91,
       "conversations": 3,
       "cpa": 6.3,
       "clicks": 13,
-      "ctr": 0.7004,
-      "reach": 1223,
-      "impressions": 1856,
+      "ctr": 0.7001,
+      "reach": 1227,
+      "impressions": 1857,
       "profile_visits": 245
     },
     {
@@ -268,10 +267,10 @@
       "conversations": 2,
       "cpa": 7.83,
       "clicks": 13,
-      "ctr": 0.9826,
-      "reach": 1119,
-      "impressions": 1323,
-      "profile_visits": 179
+      "ctr": 0.9819,
+      "reach": 1122,
+      "impressions": 1324,
+      "profile_visits": 180
     },
     {
       "name": "Ad 00 - REELS - DOBRO - BELÉM — RESULTADO EM DOBRO",
@@ -284,9 +283,9 @@
       "conversations": 4,
       "cpa": 5.07,
       "clicks": 20,
-      "ctr": 0.0163,
-      "reach": 1046,
-      "impressions": 1230,
+      "ctr": 0.0162,
+      "reach": 1048,
+      "impressions": 1231,
       "profile_visits": 311
     },
     {
@@ -312,13 +311,13 @@
       "offer": "MULTIFOCAL",
       "hook": "MULTIFOCAL",
       "status": "ATIVO",
-      "spend": 10.34,
+      "spend": 10.44,
       "conversations": 1,
-      "cpa": 10.34,
+      "cpa": 10.44,
       "clicks": 7,
       "ctr": 0.0103,
       "reach": 572,
-      "impressions": 677,
+      "impressions": 678,
       "profile_visits": 145
     },
     {
@@ -333,9 +332,9 @@
       "cpa": 12.87,
       "clicks": 6,
       "ctr": 0.8969,
-      "reach": 568,
+      "reach": 569,
       "impressions": 669,
-      "profile_visits": 201
+      "profile_visits": 202
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL HOYA - BELÉM - NÃO TÁ ENXERGANDO",
@@ -349,7 +348,7 @@
       "cpa": 8.86,
       "clicks": 3,
       "ctr": 0.8646,
-      "reach": 306,
+      "reach": 307,
       "impressions": 347,
       "profile_visits": 81
     },
@@ -364,10 +363,10 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 8,
-      "ctr": 0.2132,
+      "ctr": 0.213,
       "reach": 2013,
-      "impressions": 3753,
-      "profile_visits": 228
+      "impressions": 3755,
+      "profile_visits": 229
     },
     {
       "name": "Ad 04 - REELS - AQUECIMENTO - CASTANHAL",
@@ -392,14 +391,14 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 7.83,
+      "spend": 7.87,
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 6,
-      "ctr": 0.1735,
-      "reach": 1573,
-      "impressions": 3458,
-      "profile_visits": 156
+      "ctr": 0.1729,
+      "reach": 1586,
+      "impressions": 3471,
+      "profile_visits": 158
     },
     {
       "name": "Ad 06 - REELS - AQUECIMENTO - CASTANHAL",
@@ -440,14 +439,14 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 8.79,
+      "spend": 8.8,
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 9,
-      "ctr": 0.2919,
-      "reach": 1280,
-      "impressions": 3083,
-      "profile_visits": 168
+      "ctr": 0.2915,
+      "reach": 1286,
+      "impressions": 3087,
+      "profile_visits": 170
     },
     {
       "name": "Ad 06 - REELS - AQUECIMENTO - CAPANEMA",
@@ -456,13 +455,13 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 8.66,
+      "spend": 8.67,
       "conversations": 2,
       "cpa": 4.33,
       "clicks": 7,
-      "ctr": 0.225,
-      "reach": 1066,
-      "impressions": 3111,
+      "ctr": 0.2248,
+      "reach": 1073,
+      "impressions": 3114,
       "profile_visits": 122
     }
   ]
