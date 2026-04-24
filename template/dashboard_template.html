@@ -1007,6 +1007,24 @@ function renderOffersChart(city) {
 // Creative Cards
 // ──────────────────────────────────────────────
 
+const OFFER_THUMBS = {
+  'R$ 1,00':        'thumbnails/r1',
+  'MULTIFOCAL':     'thumbnails/multifocal',
+  'EM DOBRO':       'thumbnails/em_dobro',
+  'EXAME DE VISTA': 'thumbnails/exame_de_vista',
+  'LIGAÇÃO':        'thumbnails/ligacao',
+  'DIA DA MULHER':  'thumbnails/dia_da_mulher',
+  'AQUECIMENTO':    'thumbnails/aquecimento',
+};
+
+function offerThumbTag(offer) {
+  const base = OFFER_THUMBS[offer];
+  if (!base) return '';
+  return `<img src="${base}.jpg" alt="Thumbnail" class="dz-auto-thumb"
+               onerror="this.src='${base}.png'; this.onerror=function(){this.remove();}"
+               onload="this.closest('.drop-zone').classList.add('has-img');"/>`;
+}
+
 function renderCreativeCard(ad, rank, city) {
   const id = `${city}_${rank}`.replace(/[^a-zA-Z0-9_]/g, '_');
   const rankClass = rank <= 3 ? ` rank-${rank}` : '';
@@ -1020,6 +1038,7 @@ function renderCreativeCard(ad, rank, city) {
            ondragleave="dzDragLeave(event, '${id}')"
            ondrop="dzDrop(event, '${id}')">
         <div class="rank-badge${rankClass}">${rank}</div>
+        ${offerThumbTag(ad.offer)}
         <div class="drop-zone-hint">
           <div class="drop-icon">+</div>
           <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
