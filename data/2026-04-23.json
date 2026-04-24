@@ -3,15 +3,15 @@
     "start": "2026-04-23",
     "end": "2026-04-23"
   },
-  "generated_at": "2026-04-24T03:08:16.621967",
+  "generated_at": "2026-04-24T03:11:33.445297",
   "totals": {
-    "spend": 277.84,
+    "spend": 277.85,
     "conversations": 39,
     "cpa": 7.12,
-    "reach": 21540,
-    "impressions": 32495,
+    "reach": 21559,
+    "impressions": 32499,
     "clicks": 233,
-    "profile_visits": 4159,
+    "profile_visits": 4164,
     "ads_count": 28,
     "active_ads": 28
   },
@@ -28,7 +28,7 @@
       "cpa": 21.29,
       "clicks": 24,
       "ctr": 0.0162,
-      "reach": 1134,
+      "reach": 1138,
       "impressions": 1485,
       "profile_visits": 236
     },
@@ -76,7 +76,7 @@
       "cpa": 0.0,
       "clicks": 16,
       "ctr": 0.9575,
-      "reach": 1330,
+      "reach": 1331,
       "impressions": 1671,
       "profile_visits": 225
     },
@@ -190,7 +190,7 @@
       "ctr": 0.0144,
       "reach": 816,
       "impressions": 900,
-      "profile_visits": 259
+      "profile_visits": 260
     },
     {
       "name": "Ad 00 - REELS - DOBRO - CASTANHAL — OLHA SÓ ISSO",
@@ -220,9 +220,9 @@
       "cpa": 6.3,
       "clicks": 13,
       "ctr": 0.7001,
-      "reach": 1227,
+      "reach": 1229,
       "impressions": 1857,
-      "profile_visits": 245
+      "profile_visits": 248
     },
     {
       "name": "Ad 02 - REELS - DOBRO - CASTANHAL — SEU ÓCULOS VALE DOIS",
@@ -316,7 +316,7 @@
       "cpa": 10.44,
       "clicks": 7,
       "ctr": 0.0103,
-      "reach": 572,
+      "reach": 573,
       "impressions": 678,
       "profile_visits": 145
     },
@@ -350,7 +350,7 @@
       "ctr": 0.8646,
       "reach": 307,
       "impressions": 347,
-      "profile_visits": 81
+      "profile_visits": 82
     },
     {
       "name": "Ad 04 - REELS - AQUECIMENTO - BELÉM",
@@ -359,13 +359,13 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 8.89,
+      "spend": 8.9,
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 8,
       "ctr": 0.213,
-      "reach": 2013,
-      "impressions": 3755,
+      "reach": 2024,
+      "impressions": 3756,
       "profile_visits": 229
     },
     {
@@ -395,9 +395,9 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 6,
-      "ctr": 0.1729,
+      "ctr": 0.1727,
       "reach": 1586,
-      "impressions": 3471,
+      "impressions": 3474,
       "profile_visits": 158
     },
     {
