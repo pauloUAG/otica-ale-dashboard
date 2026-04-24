@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-24T03:19:16.348877",
+  "last_updated": "2026-04-24T11:59:24.107325",
   "period": {
     "start": "2026-01-01",
     "end": "2026-04-23"
@@ -61824,13 +61824,13 @@
       "offer": "LIGAÇÃO",
       "hook": "LIGAÇÃO",
       "status": "ATIVO",
-      "spend": 21.29,
+      "spend": 21.3,
       "conversations": 1,
-      "cpa": 21.29,
+      "cpa": 21.3,
       "clicks": 24,
       "ctr": 0.0162,
       "reach": 1138,
-      "impressions": 1485,
+      "impressions": 1486,
       "profile_visits": 236,
       "date": "2026-04-23"
     },
@@ -61847,7 +61847,7 @@
       "clicks": 17,
       "ctr": 0.0165,
       "reach": 813,
-      "impressions": 1028,
+      "impressions": 1029,
       "profile_visits": 252,
       "date": "2026-04-23"
     },
@@ -61950,7 +61950,7 @@
       "ctr": 0.7344,
       "reach": 630,
       "impressions": 817,
-      "profile_visits": 119,
+      "profile_visits": 120,
       "date": "2026-04-23"
     },
     {
@@ -62185,9 +62185,9 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 8,
-      "ctr": 0.2128,
-      "reach": 2027,
-      "impressions": 3759,
+      "ctr": 0.2127,
+      "reach": 2028,
+      "impressions": 3761,
       "profile_visits": 229,
       "date": "2026-04-23"
     },
@@ -62219,10 +62219,10 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 6,
-      "ctr": 0.1725,
-      "reach": 1586,
-      "impressions": 3478,
-      "profile_visits": 159,
+      "ctr": 0.1723,
+      "reach": 1588,
+      "impressions": 3482,
+      "profile_visits": 161,
       "date": "2026-04-23"
     },
     {
@@ -62272,8 +62272,8 @@
       "clicks": 9,
       "ctr": 0.2915,
       "reach": 1286,
-      "impressions": 3087,
-      "profile_visits": 170,
+      "impressions": 3088,
+      "profile_visits": 171,
       "date": "2026-04-23"
     },
     {
@@ -62283,13 +62283,13 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 8.67,
+      "spend": 8.68,
       "conversations": 2,
-      "cpa": 4.33,
+      "cpa": 4.34,
       "clicks": 7,
       "ctr": 0.2246,
       "reach": 1074,
-      "impressions": 3116,
+      "impressions": 3117,
       "profile_visits": 122,
       "date": "2026-04-23"
     }
