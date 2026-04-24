@@ -3,15 +3,15 @@
     "start": "2026-04-23",
     "end": "2026-04-23"
   },
-  "generated_at": "2026-04-24T03:11:33.445297",
+  "generated_at": "2026-04-24T03:19:13.921547",
   "totals": {
-    "spend": 277.85,
+    "spend": 277.87,
     "conversations": 39,
     "cpa": 7.12,
-    "reach": 21559,
-    "impressions": 32499,
+    "reach": 21568,
+    "impressions": 32508,
     "clicks": 233,
-    "profile_visits": 4164,
+    "profile_visits": 4168,
     "ads_count": 28,
     "active_ads": 28
   },
@@ -30,7 +30,8 @@
       "ctr": 0.0162,
       "reach": 1138,
       "impressions": 1485,
-      "profile_visits": 236
+      "profile_visits": 236,
+      "preview_url": "https://fb.me/2i6QXSesNZas19N"
     },
     {
       "name": "Ad 00 - REELS - R$1,00 - BELÉM - COMO QUE UMA ARMAÇÃO",
@@ -46,7 +47,8 @@
       "ctr": 0.0165,
       "reach": 813,
       "impressions": 1028,
-      "profile_visits": 252
+      "profile_visits": 252,
+      "preview_url": "https://fb.me/2pn9pntJyR968jR"
     },
     {
       "name": "Ad 00 - REELS - EXAME DE VISTA - BELÉM",
@@ -60,9 +62,10 @@
       "cpa": 2.9,
       "clicks": 8,
       "ctr": 0.0159,
-      "reach": 456,
+      "reach": 457,
       "impressions": 504,
-      "profile_visits": 103
+      "profile_visits": 104,
+      "preview_url": "https://fb.me/25aJUQFuJQeKbWh"
     },
     {
       "name": "Ad 01 - REELS - EXAME DE VISTA - CAPANEMA",
@@ -78,7 +81,8 @@
       "ctr": 0.9575,
       "reach": 1331,
       "impressions": 1671,
-      "profile_visits": 225
+      "profile_visits": 225,
+      "preview_url": "https://fb.me/20Z7pvxlWnd6J0R"
     },
     {
       "name": "Ad 01 - REELS - EXAME DE VISTA - BELÉM",
@@ -94,7 +98,8 @@
       "ctr": 0.0274,
       "reach": 125,
       "impressions": 146,
-      "profile_visits": 26
+      "profile_visits": 26,
+      "preview_url": "https://fb.me/255f3U2sitpKFpK"
     },
     {
       "name": "Ad - 00 - REELS - R$1,00 - CASTANHAL - VALOR MEGA ACESSÍVEL",
@@ -110,7 +115,8 @@
       "ctr": 0.9041,
       "reach": 2080,
       "impressions": 2544,
-      "profile_visits": 291
+      "profile_visits": 292,
+      "preview_url": "https://fb.me/25SXrKG86bZEzkB"
     },
     {
       "name": "Ad 00 - REELS - R$1,00 - ANANINDEUA - COMO QUE UMA ARMAÇÃO",
@@ -126,7 +132,8 @@
       "ctr": 0.8312,
       "reach": 1711,
       "impressions": 1925,
-      "profile_visits": 378
+      "profile_visits": 378,
+      "preview_url": "https://fb.me/1PmnrkDhfEgQGsj"
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL - CASTANHAL",
@@ -142,7 +149,8 @@
       "ctr": 0.7344,
       "reach": 630,
       "impressions": 817,
-      "profile_visits": 119
+      "profile_visits": 119,
+      "preview_url": "https://fb.me/1QjQCW2Cxch2gkM"
     },
     {
       "name": "Ad 00 - REELS - LIGAÇÃO - ANANINDEUA - ALERTA URGENTE",
@@ -158,7 +166,8 @@
       "ctr": 0.4689,
       "reach": 743,
       "impressions": 853,
-      "profile_visits": 203
+      "profile_visits": 203,
+      "preview_url": "https://fb.me/295RJhD4qMdgxOr"
     },
     {
       "name": "Ad 00 - REELS - DOBRO - BELÉM —  INFLUENCER",
@@ -174,7 +183,8 @@
       "ctr": 0.0189,
       "reach": 140,
       "impressions": 159,
-      "profile_visits": 54
+      "profile_visits": 54,
+      "preview_url": "https://fb.me/27NDCJNKJGWIEDP"
     },
     {
       "name": "Ad 01 - REELS - LIGAÇÃO - BELÉM",
@@ -190,7 +200,8 @@
       "ctr": 0.0144,
       "reach": 816,
       "impressions": 900,
-      "profile_visits": 260
+      "profile_visits": 260,
+      "preview_url": "https://fb.me/yhq3Z7XY11hIDPG"
     },
     {
       "name": "Ad 00 - REELS - DOBRO - CASTANHAL — OLHA SÓ ISSO",
@@ -206,7 +217,8 @@
       "ctr": 0.0,
       "reach": 25,
       "impressions": 30,
-      "profile_visits": 11
+      "profile_visits": 11,
+      "preview_url": "https://fb.me/2qvYzm93lw3KqK8"
     },
     {
       "name": "Ad 01 - REELS - DOBRO - CASTANHAL —  RESULTADO EM DOBRO",
@@ -222,7 +234,8 @@
       "ctr": 0.7001,
       "reach": 1229,
       "impressions": 1857,
-      "profile_visits": 248
+      "profile_visits": 248,
+      "preview_url": "https://fb.me/y71eycGXIooTIkA"
     },
     {
       "name": "Ad 02 - REELS - DOBRO - CASTANHAL — SEU ÓCULOS VALE DOIS",
@@ -238,7 +251,8 @@
       "ctr": 0.0317,
       "reach": 56,
       "impressions": 63,
-      "profile_visits": 13
+      "profile_visits": 13,
+      "preview_url": "https://fb.me/2gmoz1OcEZNLXJ3"
     },
     {
       "name": "Ad 00 - REELS - DOBRO - ANANINDEUA - OLHA SÓ ISSO",
@@ -254,7 +268,8 @@
       "ctr": 0.0,
       "reach": 11,
       "impressions": 11,
-      "profile_visits": 3
+      "profile_visits": 3,
+      "preview_url": "https://fb.me/1TgHSYEBEEgo6dG"
     },
     {
       "name": "Ad 02 - REELS - DOBRO - ANANINDEUA - SEU ÓCULOS VALE DOIS",
@@ -268,9 +283,10 @@
       "cpa": 7.83,
       "clicks": 13,
       "ctr": 0.9819,
-      "reach": 1122,
+      "reach": 1126,
       "impressions": 1324,
-      "profile_visits": 180
+      "profile_visits": 180,
+      "preview_url": "https://fb.me/2km1o3ayULfoUMQ"
     },
     {
       "name": "Ad 00 - REELS - DOBRO - BELÉM — RESULTADO EM DOBRO",
@@ -286,7 +302,8 @@
       "ctr": 0.0162,
       "reach": 1048,
       "impressions": 1231,
-      "profile_visits": 311
+      "profile_visits": 311,
+      "preview_url": "https://fb.me/ygZMxsDCyhVe9e7"
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL HOYA - CASTANHAL - NÃO DEVERIA FALAR  ISSO",
@@ -302,7 +319,8 @@
       "ctr": 0.6711,
       "reach": 592,
       "impressions": 745,
-      "profile_visits": 139
+      "profile_visits": 139,
+      "preview_url": "https://fb.me/2oN6XBE8F1AsAkK"
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL HOYA - ANANINDEUA - OLHA O TANTO DE HOYA",
@@ -318,7 +336,8 @@
       "ctr": 0.0103,
       "reach": 573,
       "impressions": 678,
-      "profile_visits": 145
+      "profile_visits": 146,
+      "preview_url": "https://fb.me/26We9KMsjEdIuoq"
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL HOYA - BELÉM - NÃO DEVERIA FALAR ISSO",
@@ -334,7 +353,8 @@
       "ctr": 0.8969,
       "reach": 569,
       "impressions": 669,
-      "profile_visits": 202
+      "profile_visits": 202,
+      "preview_url": "https://fb.me/2m8dRgrXo0HLIPB"
     },
     {
       "name": "Ad 01 - REELS - MULTIFOCAL HOYA - BELÉM - NÃO TÁ ENXERGANDO",
@@ -350,7 +370,8 @@
       "ctr": 0.8646,
       "reach": 307,
       "impressions": 347,
-      "profile_visits": 82
+      "profile_visits": 82,
+      "preview_url": "https://fb.me/22j7jmeNdgzgC4W"
     },
     {
       "name": "Ad 04 - REELS - AQUECIMENTO - BELÉM",
@@ -359,14 +380,15 @@
       "offer": "AQUECIMENTO",
       "hook": "OUTRO",
       "status": "ATIVO",
-      "spend": 8.9,
+      "spend": 8.92,
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 8,
-      "ctr": 0.213,
-      "reach": 2024,
-      "impressions": 3756,
-      "profile_visits": 229
+      "ctr": 0.2128,
+      "reach": 2027,
+      "impressions": 3759,
+      "profile_visits": 229,
+      "preview_url": "https://fb.me/1U7ihKEXmcwISxc"
     },
     {
       "name": "Ad 04 - REELS - AQUECIMENTO - CASTANHAL",
@@ -382,7 +404,8 @@
       "ctr": 0.0,
       "reach": 14,
       "impressions": 14,
-      "profile_visits": 2
+      "profile_visits": 2,
+      "preview_url": "https://fb.me/2jwxWcBkeh99W80"
     },
     {
       "name": "Ad 05 - REELS - AQUECIMENTO - CASTANHAL",
@@ -395,10 +418,11 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 6,
-      "ctr": 0.1727,
+      "ctr": 0.1725,
       "reach": 1586,
-      "impressions": 3474,
-      "profile_visits": 158
+      "impressions": 3478,
+      "profile_visits": 159,
+      "preview_url": "https://fb.me/20t4glEIGXSSzPJ"
     },
     {
       "name": "Ad 06 - REELS - AQUECIMENTO - CASTANHAL",
@@ -414,7 +438,8 @@
       "ctr": 0.0,
       "reach": 59,
       "impressions": 65,
-      "profile_visits": 1
+      "profile_visits": 1,
+      "preview_url": "https://fb.me/23JxV1pxpWMROqE"
     },
     {
       "name": "Ad 04 - REELS - AQUECIMENTO - ANANINDEUA",
@@ -430,7 +455,8 @@
       "ctr": 0.0,
       "reach": 2,
       "impressions": 2,
-      "profile_visits": 1
+      "profile_visits": 1,
+      "preview_url": "https://fb.me/28vJUB66p8CcDvr"
     },
     {
       "name": "Ad 06 - REELS - AQUECIMENTO - ANANINDEUA",
@@ -446,7 +472,8 @@
       "ctr": 0.2915,
       "reach": 1286,
       "impressions": 3087,
-      "profile_visits": 170
+      "profile_visits": 170,
+      "preview_url": "https://fb.me/29CqZtth5vB8Wag"
     },
     {
       "name": "Ad 06 - REELS - AQUECIMENTO - CAPANEMA",
@@ -459,10 +486,11 @@
       "conversations": 2,
       "cpa": 4.33,
       "clicks": 7,
-      "ctr": 0.2248,
-      "reach": 1073,
-      "impressions": 3114,
-      "profile_visits": 122
+      "ctr": 0.2246,
+      "reach": 1074,
+      "impressions": 3116,
+      "profile_visits": 122,
+      "preview_url": "https://fb.me/2pGvyXeb7IoDgrB"
     }
   ]
 }
