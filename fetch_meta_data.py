@@ -51,6 +51,7 @@ OFFERS = [
     ("DIA DA MULHER",   "DIA DA MULHER"),
     ("R$1,00",          "R$ 1,00"),
     ("R$1",             "R$ 1,00"),
+    ("AQUECIMENTO",     "AQUECIMENTO"),
 ]
 
 HOOKS = [
