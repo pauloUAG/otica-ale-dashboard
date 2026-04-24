@@ -104,6 +104,32 @@ def extract_hook(ad_name: str) -> str:
 # Meta API
 # ---------------------------------------------------------------------------
 
+def fetch_preview_links(ad_ids: list[str]) -> dict[str, str]:
+    """Busca preview_shareable_link para cada ad_id via endpoint de anúncios."""
+    if not ad_ids:
+        return {}
+    url = f"{GRAPH_BASE}/act_{AD_ACCOUNT_ID}/ads"
+    params = {
+        "fields": "id,preview_shareable_link",
+        "filtering": json.dumps([{"field": "id", "operator": "IN", "value": ad_ids}]),
+        "limit": 500,
+        "access_token": ACCESS_TOKEN,
+    }
+    links = {}
+    while url:
+        resp = requests.get(url, params=params, timeout=120)
+        if resp.status_code != 200:
+            print(f"\nAviso: erro ao buscar preview links: {resp.status_code}")
+            break
+        body = resp.json()
+        for ad in body.get("data", []):
+            if ad.get("preview_shareable_link"):
+                links[ad["id"]] = ad["preview_shareable_link"]
+        url = body.get("paging", {}).get("next")
+        params = {}
+    return links
+
+
 def fetch_all_insights(since: str, until: str, time_increment: int | None = None) -> list[dict]:
     """Busca todos os insights a nível de anúncio com paginação."""
     if not ACCESS_TOKEN or not AD_ACCOUNT_ID:
@@ -322,6 +348,11 @@ def main():
     print("\nProcessando dados...")
     ads = [process_row(r) for r in raw_rows]
     ads = [a for a in ads if a["spend"] > 0]  # remove zerados
+
+    print("\nBuscando links de prévia dos criativos...")
+    preview_links = fetch_preview_links([a["ad_id"] for a in ads if a.get("ad_id")])
+    for a in ads:
+        a["preview_url"] = preview_links.get(a["ad_id"], "")
 
     totals = build_totals(ads)
 
