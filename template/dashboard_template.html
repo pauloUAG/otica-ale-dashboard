@@ -1060,7 +1060,7 @@ function renderCreativeCard(ad, rank, city) {
           <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
         </div>
         <input type="file" accept="image/*" onchange="dzFileInput(event, '${id}')" title="Selecionar imagem"/>
-        ${DASHBOARD_DATA.ad_account_id ? `<a class="dz-manager-link" href="https://www.facebook.com/adsmanager/manage/ads?act=${DASHBOARD_DATA.ad_account_id}&selected_ad_ids=${ad.ad_id}" target="_blank" title="Ver no Meta Ads Manager">↗</a>` : ''}
+        ${ad.ad_id ? `<a class="dz-manager-link" href="https://www.facebook.com/ads/library/?id=${ad.ad_id}" target="_blank" title="Ver criativo na Biblioteca de Anúncios">↗</a>` : ''}
       </div>
       <div class="creative-body">
         <span class="offer-badge" style="${offerBadgeStyle(ad.offer)}">${ad.offer}</span>

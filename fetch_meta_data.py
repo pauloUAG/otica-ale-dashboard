@@ -328,7 +328,6 @@ def main():
     output = {
         "period": {"start": since, "end": until},
         "generated_at": datetime.now().isoformat(),
-        "ad_account_id": AD_ACCOUNT_ID,
         "totals": totals,
         "ads": ads,
     }

@@ -160,8 +160,7 @@ def main():
         print(f"\nERRO: {template_path} não encontrado.")
         return
 
-    history_data  = None  # só carregado se existir
-    ad_account_id = ""
+    history_data = None  # só carregado se existir
 
     if source == "history":
         history_path = "data/history.json"
@@ -185,9 +184,8 @@ def main():
         print(f"\nFonte: {data_path}")
         with open(data_path, encoding="utf-8") as f:
             weekly_data = json.load(f)
-        ads            = weekly_data["ads"]
-        period         = weekly_data["period"]
-        ad_account_id  = weekly_data.get("ad_account_id", "")
+        ads     = weekly_data["ads"]
+        period  = weekly_data["period"]
         # Tenta carregar histórico também, se existir
         history_path = "data/history.json"
         if Path(history_path).exists():
@@ -209,8 +207,7 @@ def main():
         "has_history":    history_data is not None,
         "totals":         totals,
         "cities":         cities,
-        "offer_colors":   OFFER_COLORS,
-        "ad_account_id":  ad_account_id,
+        "offer_colors":  OFFER_COLORS,
     }
 
     os.makedirs("output", exist_ok=True)
