@@ -105,28 +105,25 @@ def extract_hook(ad_name: str) -> str:
 # ---------------------------------------------------------------------------
 
 def fetch_preview_links(ad_ids: list[str]) -> dict[str, str]:
-    """Busca preview_shareable_link para cada ad_id via endpoint de anúncios."""
+    """Busca preview_shareable_link via endpoint de IDs múltiplos do Meta."""
     if not ad_ids:
         return {}
-    url = f"{GRAPH_BASE}/act_{AD_ACCOUNT_ID}/ads"
-    params = {
-        "fields": "id,preview_shareable_link",
-        "filtering": json.dumps([{"field": "id", "operator": "IN", "value": ad_ids}]),
-        "limit": 500,
-        "access_token": ACCESS_TOKEN,
-    }
     links = {}
-    while url:
-        resp = requests.get(url, params=params, timeout=120)
+    batch_size = 50
+    for i in range(0, len(ad_ids), batch_size):
+        batch = ad_ids[i:i + batch_size]
+        params = {
+            "ids": ",".join(batch),
+            "fields": "preview_shareable_link",
+            "access_token": ACCESS_TOKEN,
+        }
+        resp = requests.get(GRAPH_BASE + "/", params=params, timeout=120)
         if resp.status_code != 200:
-            print(f"\nAviso: erro ao buscar preview links: {resp.status_code}")
-            break
-        body = resp.json()
-        for ad in body.get("data", []):
-            if ad.get("preview_shareable_link"):
-                links[ad["id"]] = ad["preview_shareable_link"]
-        url = body.get("paging", {}).get("next")
-        params = {}
+            print(f"\nAviso: erro ao buscar preview links: {resp.status_code}: {resp.text[:200]}")
+            continue
+        for ad_id, ad_data in resp.json().items():
+            if isinstance(ad_data, dict) and ad_data.get("preview_shareable_link"):
+                links[ad_id] = ad_data["preview_shareable_link"]
     return links
 
 
