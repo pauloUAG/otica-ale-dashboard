@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-27T12:51:01.029538",
+  "last_updated": "2026-04-27T13:17:58.789653",
   "period": {
     "start": "2026-01-01",
     "end": "2026-04-26"
@@ -64142,7 +64142,7 @@
       "clicks": 11,
       "ctr": 0.3214,
       "reach": 2033,
-      "impressions": 3422,
+      "impressions": 3423,
       "profile_visits": 171,
       "date": "2026-04-26"
     },
@@ -64242,9 +64242,9 @@
       "conversations": 0,
       "cpa": 0.0,
       "clicks": 8,
-      "ctr": 0.2372,
+      "ctr": 0.2371,
       "reach": 1480,
-      "impressions": 3373,
+      "impressions": 3374,
       "profile_visits": 182,
       "date": "2026-04-26"
     },
