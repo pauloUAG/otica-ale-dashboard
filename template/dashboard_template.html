@@ -427,20 +427,32 @@
     transform: translateY(-2px);
   }
 
-  /* Drop zone */
-  .creative-thumb-area {
-    aspect-ratio: 9/16;
-    background: var(--bg);
+  /* Creative card header */
+  .creative-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
+    background: var(--bg);
   }
+  .rank-badge {
+    width: 26px;
+    height: 26px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .rank-1 { background: rgba(184,134,11,.9); }
+  .rank-2 { background: rgba(100,116,139,.9); }
+  .rank-3 { background: rgba(146,64,14,.85); }
   .dz-manager-link {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 10;
-    background: rgba(255,255,255,0.9);
     color: var(--teal);
     border: 1px solid var(--teal-mid);
     border-radius: 6px;
@@ -449,29 +461,9 @@
     padding: 2px 7px;
     text-decoration: none;
     line-height: 1.6;
+    background: var(--surface);
   }
   .dz-manager-link:hover { background: var(--teal); color: #fff; }
-  /* Rank badge */
-  .rank-badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 26px;
-    height: 26px;
-    background: rgba(0,0,0,.65);
-    color: #fff;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-    z-index: 2;
-  }
-  .rank-1 { background: rgba(184,134,11,.9); }
-  .rank-2 { background: rgba(100,116,139,.9); }
-  .rank-3 { background: rgba(146,64,14,.85); }
 
   /* Creative card body */
   .creative-body {
@@ -979,7 +971,7 @@ function renderCreativeCard(ad, rank, city) {
 
   return `
     <div class="creative-card">
-      <div class="creative-thumb-area">
+      <div class="creative-card-header">
         <div class="rank-badge${rankClass}">${rank}</div>
         ${previewUrl ? `<a class="dz-manager-link" href="${previewUrl}" target="_blank" title="Ver prévia do criativo">↗</a>` : ''}
       </div>
