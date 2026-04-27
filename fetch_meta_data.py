@@ -105,25 +105,36 @@ def extract_hook(ad_name: str) -> str:
 # ---------------------------------------------------------------------------
 
 def fetch_preview_links(ad_ids: list[str]) -> dict[str, str]:
-    """Busca preview_shareable_link via endpoint de IDs múltiplos do Meta."""
+    """Busca preview_shareable_link via Meta Batch API."""
     if not ad_ids:
         return {}
     links = {}
     batch_size = 50
     for i in range(0, len(ad_ids), batch_size):
         batch = ad_ids[i:i + batch_size]
-        params = {
-            "ids": ",".join(batch),
-            "fields": "preview_shareable_link",
-            "access_token": ACCESS_TOKEN,
-        }
-        resp = requests.get(GRAPH_BASE + "/", params=params, timeout=120)
+        batch_requests = [
+            {"method": "GET", "relative_url": f"{ad_id}?fields=preview_shareable_link"}
+            for ad_id in batch
+        ]
+        resp = requests.post(
+            GRAPH_BASE,
+            data={"access_token": ACCESS_TOKEN, "batch": json.dumps(batch_requests)},
+            timeout=120,
+        )
         if resp.status_code != 200:
-            print(f"\nAviso: erro ao buscar preview links: {resp.status_code}: {resp.text[:200]}")
+            print(f"\nAviso: erro no batch de preview links: {resp.status_code}: {resp.text[:300]}")
             continue
-        for ad_id, ad_data in resp.json().items():
-            if isinstance(ad_data, dict) and ad_data.get("preview_shareable_link"):
-                links[ad_id] = ad_data["preview_shareable_link"]
+        results = resp.json()
+        # Debug: mostra primeira resposta do batch
+        if i == 0 and results:
+            first = results[0]
+            print(f"  Debug preview (primeiro ad): code={first.get('code')} body={str(first.get('body',''))[:200]}")
+        for j, result in enumerate(results or []):
+            if result and result.get("code") == 200:
+                body = json.loads(result["body"])
+                url = body.get("preview_shareable_link", "")
+                if url:
+                    links[batch[j]] = url
     return links
 
 
