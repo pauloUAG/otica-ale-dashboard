@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-27T12:21:17.710839",
+  "last_updated": "2026-04-27T12:51:01.029538",
   "period": {
     "start": "2026-01-01",
     "end": "2026-04-26"
@@ -64259,9 +64259,9 @@
       "conversations": 1,
       "cpa": 9.68,
       "clicks": 9,
-      "ctr": 0.2814,
+      "ctr": 0.2813,
       "reach": 1088,
-      "impressions": 3198,
+      "impressions": 3199,
       "profile_visits": 117,
       "date": "2026-04-26"
     },
