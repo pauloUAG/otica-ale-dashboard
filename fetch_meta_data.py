@@ -362,6 +362,18 @@ def main():
     for a in ads:
         a["preview_url"] = preview_links.get(a["ad_id"], "")
 
+    # Acumula preview_urls em arquivo persistente
+    preview_path = "data/preview_urls.json"
+    if Path(preview_path).exists():
+        with open(preview_path, encoding="utf-8") as f:
+            accumulated = json.load(f)
+    else:
+        accumulated = {}
+    accumulated.update(preview_links)
+    with open(preview_path, "w", encoding="utf-8") as f:
+        json.dump(accumulated, f, ensure_ascii=False, indent=2)
+    print(f"✓ preview_urls.json: {len(accumulated)} links acumulados")
+
     totals = build_totals(ads)
 
     output = {
