@@ -428,40 +428,13 @@
   }
 
   /* Drop zone */
-  .drop-zone {
+  .creative-thumb-area {
     aspect-ratio: 9/16;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 8px;
-    cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: background .15s;
   }
-  .drop-zone:hover, .drop-zone.drag-over {
-    background: var(--teal-light);
-    border-color: var(--teal);
-  }
-  .drop-zone.has-img { background: #000; }
-  .drop-zone img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    inset: 0;
-  }
-  .drop-zone-hint {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    pointer-events: none;
-  }
-  .drop-zone.has-img .drop-zone-hint { display: none; }
   .dz-manager-link {
     position: absolute;
     top: 8px;
@@ -478,28 +451,6 @@
     line-height: 1.6;
   }
   .dz-manager-link:hover { background: var(--teal); color: #fff; }
-  .drop-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-3);
-    font-size: 16px;
-  }
-  .drop-text { font-size: 11px; color: var(--text-3); text-align: center; }
-  .drop-zone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
-
   /* Rank badge */
   .rank-badge {
     position: absolute;
@@ -863,8 +814,6 @@ function renderCityDetail(city) {
   // Render chart after DOM is updated
   renderOffersChart(city);
 
-  // Attach drag & drop handlers
-  attachDropHandlers();
 }
 
 // ──────────────────────────────────────────────
@@ -1023,44 +972,16 @@ function renderOffersChart(city) {
 // Creative Cards
 // ──────────────────────────────────────────────
 
-const OFFER_THUMBS = {
-  'R$ 1,00':        'thumbnails/r1',
-  'MULTIFOCAL':     'thumbnails/multifocal',
-  'EM DOBRO':       'thumbnails/em_dobro',
-  'EXAME DE VISTA': 'thumbnails/exame_de_vista',
-  'LIGAÇÃO':        'thumbnails/ligacao',
-  'DIA DA MULHER':  'thumbnails/dia_da_mulher',
-  'AQUECIMENTO':    'thumbnails/aquecimento',
-};
-
-function offerThumbTag(offer) {
-  const base = OFFER_THUMBS[offer];
-  if (!base) return '';
-  return `<img src="${base}.jpg" alt="Thumbnail" class="dz-auto-thumb"
-               onerror="this.src='${base}.png'; this.onerror=function(){this.remove();}"
-               onload="this.closest('.drop-zone').classList.add('has-img');"/>`;
-}
-
 function renderCreativeCard(ad, rank, city) {
-  const id = `${city}_${rank}`.replace(/[^a-zA-Z0-9_]/g, '_');
   const rankClass = rank <= 3 ? ` rank-${rank}` : '';
   const cpaCol = cpaColor(ad.cpa);
+  const previewUrl = DASHBOARD_DATA.preview_urls && (DASHBOARD_DATA.preview_urls[ad.ad_id] || ad.preview_url);
 
   return `
     <div class="creative-card">
-      <div class="drop-zone"
-           id="dz-${id}"
-           ondragover="dzDragOver(event)"
-           ondragleave="dzDragLeave(event, '${id}')"
-           ondrop="dzDrop(event, '${id}')">
+      <div class="creative-thumb-area">
         <div class="rank-badge${rankClass}">${rank}</div>
-        ${offerThumbTag(ad.offer)}
-        <div class="drop-zone-hint">
-          <div class="drop-icon">+</div>
-          <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
-        </div>
-        <input type="file" accept="image/*" onchange="dzFileInput(event, '${id}')" title="Selecionar imagem"/>
-        ${(DASHBOARD_DATA.preview_urls && (DASHBOARD_DATA.preview_urls[ad.ad_id] || ad.preview_url)) ? `<a class="dz-manager-link" href="${DASHBOARD_DATA.preview_urls[ad.ad_id] || ad.preview_url}" target="_blank" title="Ver prévia do criativo">↗</a>` : ''}
+        ${previewUrl ? `<a class="dz-manager-link" href="${previewUrl}" target="_blank" title="Ver prévia do criativo">↗</a>` : ''}
       </div>
       <div class="creative-body">
         <span class="offer-badge" style="${offerBadgeStyle(ad.offer)}">${ad.offer}</span>
@@ -1097,57 +1018,6 @@ function escHtml(str) {
 }
 
 // ──────────────────────────────────────────────
-// Drag & Drop for thumbnails
-// ──────────────────────────────────────────────
-
-function attachDropHandlers() {
-  // handlers are inline via ondragover/ondrop attributes
-}
-
-function dzDragOver(e) {
-  e.preventDefault();
-  const dz = e.currentTarget;
-  dz.classList.add('drag-over');
-}
-
-function dzDragLeave(e, id) {
-  const dz = document.getElementById('dz-' + id);
-  if (dz) dz.classList.remove('drag-over');
-}
-
-function dzDrop(e, id) {
-  e.preventDefault();
-  const dz = document.getElementById('dz-' + id);
-  if (dz) dz.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    loadImageIntoDZ(file, id);
-  }
-}
-
-function dzFileInput(e, id) {
-  const file = e.target.files[0];
-  if (file && file.type.startsWith('image/')) {
-    loadImageIntoDZ(file, id);
-  }
-}
-
-function loadImageIntoDZ(file, id) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dz = document.getElementById('dz-' + id);
-    if (!dz) return;
-    let img = dz.querySelector('img');
-    if (!img) {
-      img = document.createElement('img');
-      img.alt = 'Thumbnail do criativo';
-      dz.appendChild(img);
-    }
-    img.src = e.target.result;
-    dz.classList.add('has-img');
-  };
-  reader.readAsDataURL(file);
-}
 
 // ──────────────────────────────────────────────
 // Period selector (history mode)
