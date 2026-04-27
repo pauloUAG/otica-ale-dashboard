@@ -1060,7 +1060,7 @@ function renderCreativeCard(ad, rank, city) {
           <span class="drop-text">Arraste o<br/>thumbnail aqui</span>
         </div>
         <input type="file" accept="image/*" onchange="dzFileInput(event, '${id}')" title="Selecionar imagem"/>
-        ${ad.preview_url ? `<a class="dz-manager-link" href="${ad.preview_url}" target="_blank" title="Ver prévia do criativo">↗</a>` : ''}
+        ${(DASHBOARD_DATA.preview_urls && (DASHBOARD_DATA.preview_urls[ad.ad_id] || ad.preview_url)) ? `<a class="dz-manager-link" href="${DASHBOARD_DATA.preview_urls[ad.ad_id] || ad.preview_url}" target="_blank" title="Ver prévia do criativo">↗</a>` : ''}
       </div>
       <div class="creative-body">
         <span class="offer-badge" style="${offerBadgeStyle(ad.offer)}">${ad.offer}</span>

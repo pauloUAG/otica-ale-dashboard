@@ -195,6 +195,18 @@ def main():
     totals  = build_totals(ads)
     cities  = group_by_city(ads)
 
+    # Mapa ad_id → preview_url acumulado de todos os arquivos históricos
+    preview_urls = {}
+    for f_path in sorted(Path("data").glob("????-??-??.json")):
+        try:
+            with open(f_path, encoding="utf-8") as f:
+                d = json.load(f)
+            for a in d.get("ads", []):
+                if a.get("ad_id") and a.get("preview_url"):
+                    preview_urls[a["ad_id"]] = a["preview_url"]
+        except Exception:
+            pass
+
     print(f"Periodo: {period.get('start','')} a {period.get('end','')}")
     print(f"Anuncios: {totals['ads_count']} | Conversas: {totals['conversations']} | Investimento: R$ {totals['spend']:,.2f}")
     print(f"Cidades: {', '.join(c['city'] for c in cities)}")
@@ -207,7 +219,8 @@ def main():
         "has_history":    history_data is not None,
         "totals":         totals,
         "cities":         cities,
-        "offer_colors":  OFFER_COLORS,
+        "offer_colors":   OFFER_COLORS,
+        "preview_urls":   preview_urls,
     }
 
     os.makedirs("output", exist_ok=True)
