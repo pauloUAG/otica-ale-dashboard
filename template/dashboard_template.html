@@ -358,7 +358,17 @@
     letter-spacing: .5px;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
   }
+  .offers-table th:hover { color: var(--text-1); }
+  .offers-table th .sort-icon { margin-left: 4px; opacity: .4; }
+  .offers-table th.sort-asc  .sort-icon { opacity: 1; }
+  .offers-table th.sort-asc  .sort-icon::after { content: '↑'; }
+  .offers-table th.sort-desc .sort-icon { opacity: 1; }
+  .offers-table th.sort-desc .sort-icon::after { content: '↓'; }
+  .offers-table th:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: '↕'; }
   .offers-table td {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
@@ -791,7 +801,7 @@ function renderCityDetail(city) {
       <div class="card">
         <div class="card-header">Ofertas</div>
         <div class="card-body" style="padding:0">
-          ${renderOffersTable(city.offers_list)}
+          ${renderOffersTable(city.offers_list, 'offers-' + city.city.replace(/[^a-z0-9]/gi,'_'))}
         </div>
       </div>
     </div>
@@ -812,7 +822,32 @@ function renderCityDetail(city) {
 // Offers Table
 // ──────────────────────────────────────────────
 
-function renderOffersTable(offers) {
+const _offerSort = {};
+
+function sortOffersTable(tableId, col, numeric) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const state = _offerSort[tableId] || { col: null, asc: true };
+  const asc = state.col === col ? !state.asc : true;
+  _offerSort[tableId] = { col, asc };
+
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a, b) => {
+    const av = a.cells[col].dataset.val;
+    const bv = b.cells[col].dataset.val;
+    const cmp = numeric ? parseFloat(av) - parseFloat(bv) : av.localeCompare(bv, 'pt-BR');
+    return asc ? cmp : -cmp;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+
+  table.querySelectorAll('th').forEach((th, i) => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (i === col) th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  });
+}
+
+function renderOffersTable(offers, tableId) {
   if (!offers || offers.length === 0) {
     return '<div class="empty-state">Sem dados de oferta</div>';
   }
@@ -821,30 +856,34 @@ function renderOffersTable(offers) {
     const health = healthClass(o.cpa);
     return `
       <tr>
-        <td>
+        <td data-val="${o.offer}">
           <span class="offer-badge" style="${offerBadgeStyle(o.offer)}">${o.offer}</span>
         </td>
-        <td class="mono">${fmt.brl(o.spend)}</td>
-        <td class="mono">${fmt.num(o.conversations)}</td>
-        <td class="mono ${cpaColor(o.cpa)}">${o.cpa > 0 ? fmt.brl(o.cpa) : '—'}</td>
-        <td class="mono">${fmt.num(o.clicks)}</td>
-        <td><span class="health-badge ${health.cls}">${health.label}</span></td>
+        <td class="mono" data-val="${o.spend}">${fmt.brl(o.spend)}</td>
+        <td class="mono" data-val="${o.conversations}">${fmt.num(o.conversations)}</td>
+        <td class="mono ${cpaColor(o.cpa)}" data-val="${o.cpa}">${o.cpa > 0 ? fmt.brl(o.cpa) : '—'}</td>
+        <td class="mono" data-val="${o.clicks}">${fmt.num(o.clicks)}</td>
+        <td data-val="${o.cpa}"><span class="health-badge ${health.cls}">${health.label}</span></td>
       </tr>
     `;
   }).join('');
 
+  const cols = [
+    { label: 'Oferta',   numeric: false },
+    { label: 'Gasto',    numeric: true  },
+    { label: 'Conv.',    numeric: true  },
+    { label: 'CPA',      numeric: true  },
+    { label: 'Cliques',  numeric: true  },
+    { label: 'Saúde',    numeric: true  },
+  ];
+
+  const ths = cols.map((c, i) =>
+    `<th onclick="sortOffersTable('${tableId}',${i},${c.numeric})">${c.label}<span class="sort-icon"></span></th>`
+  ).join('');
+
   return `
-    <table class="offers-table">
-      <thead>
-        <tr>
-          <th>Oferta</th>
-          <th>Gasto</th>
-          <th>Conv.</th>
-          <th>CPA</th>
-          <th>Cliques</th>
-          <th>Saúde</th>
-        </tr>
-      </thead>
+    <table class="offers-table" id="${tableId}">
+      <thead><tr>${ths}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
