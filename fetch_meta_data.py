@@ -160,6 +160,7 @@ def fetch_all_insights(since: str, until: str, time_increment: int | None = None
         "impressions",
         "frequency",
         "cpp",
+        "instagram_profile_visits",
     ])
 
     url = f"{GRAPH_BASE}/act_{AD_ACCOUNT_ID}/insights"
@@ -354,12 +355,14 @@ def main():
     raw_rows = fetch_all_insights(since, until)
     print(f"\nTotal de registros brutos: {len(raw_rows)}")
 
-    # Debug: lista todos os action types do primeiro registro
+    # Debug: mostra todas as chaves do primeiro registro bruto
     if raw_rows:
+        print("\nDebug chaves do primeiro registro:")
+        for k, v in raw_rows[0].items():
+            if k != "actions":
+                print(f"  {k}: {str(v)[:80]}")
         all_types = sorted({a["action_type"] for r in raw_rows for a in (r.get("actions") or [])})
-        print("\nDebug action types disponíveis:")
-        for t in all_types:
-            print(f"  {t}")
+        print("  action types:", all_types)
 
     print("\nProcessando dados...")
     ads = [process_row(r) for r in raw_rows]
