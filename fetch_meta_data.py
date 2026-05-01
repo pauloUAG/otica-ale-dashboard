@@ -354,6 +354,13 @@ def main():
     raw_rows = fetch_all_insights(since, until)
     print(f"\nTotal de registros brutos: {len(raw_rows)}")
 
+    # Debug: lista todos os action types do primeiro registro
+    if raw_rows:
+        all_types = sorted({a["action_type"] for r in raw_rows for a in (r.get("actions") or [])})
+        print("\nDebug action types disponíveis:")
+        for t in all_types:
+            print(f"  {t}")
+
     print("\nProcessando dados...")
     ads = [process_row(r) for r in raw_rows]
     ads = [a for a in ads if a["spend"] > 0]  # remove zerados
