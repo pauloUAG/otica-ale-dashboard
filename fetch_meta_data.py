@@ -244,7 +244,7 @@ def process_row(row: dict) -> dict:
 
     # Visitas ao perfil do Instagram (se disponível)
     actions = row.get("actions") or []
-    profile_visits = int(get_action_value(actions, "page_engagement"))
+    profile_visits = int(row.get("instagram_profile_visits") or 0)
 
     city = extract_city(ad_name)
     offer = extract_offer(ad_name)
@@ -354,15 +354,6 @@ def main():
     print("Buscando insights da API do Meta...")
     raw_rows = fetch_all_insights(since, until)
     print(f"\nTotal de registros brutos: {len(raw_rows)}")
-
-    # Debug: mostra todas as chaves do primeiro registro bruto
-    if raw_rows:
-        print("\nDebug chaves do primeiro registro:")
-        for k, v in raw_rows[0].items():
-            if k != "actions":
-                print(f"  {k}: {str(v)[:80]}")
-        all_types = sorted({a["action_type"] for r in raw_rows for a in (r.get("actions") or [])})
-        print("  action types:", all_types)
 
     print("\nProcessando dados...")
     ads = [process_row(r) for r in raw_rows]
