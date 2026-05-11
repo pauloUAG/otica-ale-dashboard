@@ -215,7 +215,22 @@
     font-size: 11px;
     color: var(--text-3);
     margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
   }
+  .kpi-delta {
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .kpi-delta.up   { color: #1a7f55; background: #d1fae5; }
+  .kpi-delta.down { color: #b91c1c; background: #fee2e2; }
+  .city-btn-delta { font-size: 10px; font-weight: 600; margin-left: 4px; }
+  .city-btn-delta.up   { color: #1a7f55; }
+  .city-btn-delta.down { color: #b91c1c; }
 
   /* ── City Selector ── */
   .city-selector {
@@ -678,23 +693,60 @@ function initHeaderFooter() {
 }
 
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// Comparison helpers
+// ──────────────────────────────────────────────
+
+function calcPrevPeriod(start, end) {
+  const s = new Date(start + 'T12:00:00');
+  const e = new Date(end   + 'T12:00:00');
+  const days = Math.round((e - s) / 86400000) + 1;
+  const prevEnd   = new Date(s); prevEnd.setDate(prevEnd.getDate() - 1);
+  const prevStart = new Date(prevEnd); prevStart.setDate(prevStart.getDate() - days + 1);
+  return { start: prevStart.toISOString().slice(0,10), end: prevEnd.toISOString().slice(0,10) };
+}
+
+function buildTotalsFromAds(ads) {
+  const sp = ads.reduce((s,a) => s + a.spend, 0);
+  const cv = ads.reduce((s,a) => s + a.conversations, 0);
+  return {
+    spend: sp, conversations: cv,
+    cpa: cv ? +(sp/cv).toFixed(2) : 0,
+    reach:          ads.reduce((s,a) => s + a.reach, 0),
+    profile_visits: ads.reduce((s,a) => s + (a.profile_visits||0), 0),
+    ads_count:  ads.length,
+    active_ads: ads.filter(a => a.spend > 0).length,
+  };
+}
+
+function deltaTag(curr, prev, invert = false) {
+  if (prev == null || prev === 0) return '';
+  const pct = (curr - prev) / prev * 100;
+  const positive = invert ? pct < 0 : pct > 0;
+  const cls   = positive ? 'up' : 'down';
+  const arrow = pct >= 0 ? '↑' : '↓';
+  return `<span class="kpi-delta ${cls}">${arrow}${Math.abs(pct).toFixed(1)}%</span>`;
+}
+
+// ──────────────────────────────────────────────
 // KPI Cards
 // ──────────────────────────────────────────────
 
-function renderKPIsFromTotals(t) {
+function renderKPIsFromTotals(t, prev) {
+  const d = (key, inv=false) => prev ? deltaTag(t[key], prev[key], inv) : '';
   const kpis = [
-    { label: 'Investimento',    value: fmt.brl(t.spend),            sub: `${t.active_ads} anúncios ativos`, accent: false },
-    { label: 'Conversas',       value: fmt.num(t.conversations),     sub: 'Mensagens iniciadas',             accent: true  },
-    { label: 'CPA Médio',       value: fmt.brl(t.cpa),              sub: 'Custo por conversa',              accent: false },
-    { label: 'Alcance',         value: fmt.num(t.reach),             sub: 'Pessoas únicas',                  accent: false },
-    { label: 'Visitas ao Perfil', value: fmt.num(t.profile_visits),  sub: 'Via anúncios',                    accent: false },
-    { label: 'Anúncios',        value: `${t.active_ads}/${t.ads_count}`, sub: 'Ativos / Total',             accent: false },
+    { label: 'Investimento',      value: fmt.brl(t.spend),                 sub: `${t.active_ads} anúncios ativos`, accent: false, delta: d('spend')          },
+    { label: 'Conversas',         value: fmt.num(t.conversations),          sub: 'Mensagens iniciadas',             accent: true,  delta: d('conversations')   },
+    { label: 'CPA Médio',         value: fmt.brl(t.cpa),                   sub: 'Custo por conversa',              accent: false, delta: d('cpa', true)       },
+    { label: 'Alcance',           value: fmt.num(t.reach),                  sub: 'Pessoas únicas',                  accent: false, delta: d('reach')           },
+    { label: 'Visitas ao Perfil', value: fmt.num(t.profile_visits),         sub: 'Via anúncios',                    accent: false, delta: d('profile_visits')  },
+    { label: 'Anúncios',          value: `${t.active_ads}/${t.ads_count}`, sub: 'Ativos / Total',                  accent: false, delta: ''                   },
   ];
   document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
     <div class="kpi-card">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-value${k.accent ? ' accent' : ''} font-mono">${k.value}</div>
-      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-sub"><span>${k.sub}</span>${k.delta}</div>
     </div>
   `).join('');
 }
@@ -710,28 +762,34 @@ function renderKPIs() {
 let activeCity = null;
 let offerChart = null;
 
-function renderCitySelectorFromList(cities) {
+function renderCitySelectorFromList(cities, prevCities = []) {
   const container = document.getElementById('city-selector');
-  container.innerHTML = cities.map((c, i) => `
+  container.innerHTML = cities.map((c, i) => {
+    const prev = prevCities.find(p => p.city === c.city);
+    const cvDelta = prev ? deltaTag(c.conversations, prev.conversations) : '';
+    const cpaDelta = prev ? deltaTag(c.cpa, prev.cpa, true) : '';
+    return `
     <button class="city-btn${i === 0 ? ' active' : ''}"
             onclick="selectCityFromList('${c.city}', currentCities)"
             id="citybtn-${c.city}">
       <span class="city-btn-name">${c.city}</span>
       <span class="city-btn-stats">
-        <span>${c.conversations} conv.</span>
+        <span>${c.conversations} conv.${cvDelta ? ' ' + cvDelta.replace('kpi-delta','kpi-delta city-btn-delta') : ''}</span>
         <span>·</span>
-        <span class="city-btn-stat-val">${fmt.brl(c.cpa)}</span>
+        <span class="city-btn-stat-val">${fmt.brl(c.cpa)}${cpaDelta ? ' ' + cpaDelta.replace('kpi-delta','kpi-delta city-btn-delta') : ''}</span>
       </span>
-    </button>
-  `).join('');
+    </button>`;
+  }).join('');
   currentCities = cities;
   if (cities.length > 0) selectCityFromList(cities[0].city, cities);
 }
 
-let currentCities = DASHBOARD_DATA.cities;
+let currentCities    = DASHBOARD_DATA.cities;
+let currentPrevCities = [];
 
 function renderCitySelector() {
-  renderCitySelectorFromList(DASHBOARD_DATA.cities);
+  currentPrevCities = [];
+  renderCitySelectorFromList(DASHBOARD_DATA.cities, []);
 }
 
 function selectCityFromList(cityName, cities) {
@@ -740,7 +798,8 @@ function selectCityFromList(cityName, cities) {
   if (activeBtn) activeBtn.classList.add('active');
   activeCity = cityName;
   const cityData = cities.find(c => c.city === cityName);
-  if (cityData) renderCityDetail(cityData);
+  const prevCity = currentPrevCities.find(c => c.city === cityName);
+  if (cityData) renderCityDetail(cityData, prevCity || null);
 }
 
 function selectCity(cityName) {
@@ -751,43 +810,32 @@ function selectCity(cityName) {
 // City Detail
 // ──────────────────────────────────────────────
 
-function renderCityDetail(city) {
+function metricCard(label, value, cls, prev, prevVal, invert=false) {
+  const d = prev ? deltaTag(prevVal, prev, invert) : '';
+  return `<div class="metric-card">
+    <div class="metric-label">${label}</div>
+    <div class="metric-value font-mono${cls ? ' '+cls : ''}">${value}</div>
+    ${d ? `<div class="kpi-sub" style="margin-top:4px"><span></span>${d}</div>` : ''}
+  </div>`;
+}
+
+function renderCityDetail(city, prevCity) {
   const container = document.getElementById('city-detail-container');
   const cpaColorClass = cpaColor(city.cpa);
+  const p = prevCity || {};
 
   container.innerHTML = `
     <!-- City Metrics -->
     <div class="metrics-grid-3">
-      <div class="metric-card">
-        <div class="metric-label">Investimento</div>
-        <div class="metric-value font-mono">${fmt.brl(city.spend)}</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Conversas</div>
-        <div class="metric-value font-mono green">${fmt.num(city.conversations)}</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">CPA</div>
-        <div class="metric-value font-mono ${cpaColorClass}">${fmt.brl(city.cpa)}</div>
-      </div>
+      ${metricCard('Investimento', fmt.brl(city.spend),         '',            p.spend,         city.spend)}
+      ${metricCard('Conversas',   fmt.num(city.conversations),  'green',       p.conversations, city.conversations)}
+      ${metricCard('CPA',         fmt.brl(city.cpa),            cpaColorClass, p.cpa,           city.cpa, true)}
     </div>
     <div class="metrics-grid-4">
-      <div class="metric-card">
-        <div class="metric-label">Alcance</div>
-        <div class="metric-value font-mono">${fmt.num(city.reach)}</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Impressões</div>
-        <div class="metric-value font-mono">${fmt.num(city.impressions)}</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Cliques</div>
-        <div class="metric-value font-mono">${fmt.num(city.clicks)}</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Anúncios ativos</div>
-        <div class="metric-value font-mono">${city.active_ads}</div>
-      </div>
+      ${metricCard('Alcance',          fmt.num(city.reach),       '', p.reach,       city.reach)}
+      ${metricCard('Impressões',       fmt.num(city.impressions), '', p.impressions, city.impressions)}
+      ${metricCard('Cliques',          fmt.num(city.clicks),      '', p.clicks,      city.clicks)}
+      ${metricCard('Anúncios ativos',  city.active_ads,           '', null,          null)}
     </div>
 
     <!-- Chart + Table -->
@@ -1107,19 +1155,9 @@ function setPreset(days) {
   applyPeriod();
 }
 
-function applyPeriod() {
-  if (!HISTORY_DATA || !HISTORY_DATA.records) return;
-
-  const start = document.getElementById('date-start').value;
-  const end   = document.getElementById('date-end').value;
-  if (!start || !end) return;
-
-  // Filtra registros pelo período
-  const filtered = HISTORY_DATA.records.filter(r => r.date >= start && r.date <= end);
-
-  // Agrega por ad_name
+function aggregateRecords(records) {
   const agg = {};
-  for (const r of filtered) {
+  for (const r of records) {
     const key = r.name;
     if (!agg[key]) {
       agg[key] = { ...r, _ctr_sum: r.ctr || 0, _ctr_n: r.ctr ? 1 : 0 };
@@ -1130,26 +1168,34 @@ function applyPeriod() {
       d.clicks         += r.clicks;
       d.reach          += r.reach;
       d.impressions    += r.impressions;
-      d.profile_visits += r.profile_visits;
+      d.profile_visits += r.profile_visits || 0;
       d._ctr_sum       += r.ctr || 0;
       d._ctr_n         += r.ctr ? 1 : 0;
       if (r.status === 'ATIVO') d.status = 'ATIVO';
     }
   }
-
-  currentAds = Object.values(agg).map(d => ({
+  return Object.values(agg).map(d => ({
     ...d,
     ctr: d._ctr_n ? +(d._ctr_sum / d._ctr_n).toFixed(4) : 0,
     cpa: d.conversations ? +(d.spend / d.conversations).toFixed(2) : 0,
   }));
-
-  // Atualiza período exibido
-  document.getElementById('period-label').textContent = formatDateBR(start) + ' \u2014 ' + formatDateBR(end);
-
-  // Re-renderiza tudo
-  renderKPIsFromAds(currentAds);
-  renderCitySelectorFromAds(currentAds);
 }
+
+function applyPeriod() {
+  if (!HISTORY_DATA || !HISTORY_DATA.records) return;
+  const start = document.getElementById('date-start').value;
+  const end   = document.getElementById('date-end').value;
+  if (!start || !end) return;
+  const records = HISTORY_DATA.records;
+  currentAds = aggregateRecords(records.filter(r => r.date >= start && r.date <= end));
+  const prev    = calcPrevPeriod(start, end);
+  const prevAds = aggregateRecords(records.filter(r => r.date >= prev.start && r.date <= prev.end));
+  const hasPrev = prevAds.length > 0;
+  document.getElementById('period-label').textContent = formatDateBR(start) + ' — ' + formatDateBR(end);
+  renderKPIsFromAds(currentAds, hasPrev ? prevAds : null);
+  renderCitySelectorFromAds(currentAds, hasPrev ? prevAds : null);
+}
+
 
 function formatDateBR(dateStr) {
   const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -1197,23 +1243,17 @@ function groupByCity(ads) {
   return ordered;
 }
 
-function renderKPIsFromAds(ads) {
-  const sp = ads.reduce((s,a) => s + a.spend, 0);
-  const cv = ads.reduce((s,a) => s + a.conversations, 0);
-  const t = {
-    spend: sp, conversations: cv,
-    cpa: cv ? +(sp/cv).toFixed(2) : 0,
-    reach: ads.reduce((s,a) => s + a.reach, 0),
-    profile_visits: ads.reduce((s,a) => s + a.profile_visits, 0),
-    ads_count: ads.length,
-    active_ads: ads.filter(a => a.spend > 0).length,
-  };
-  renderKPIsFromTotals(t);
+function renderKPIsFromAds(ads, prevAds) {
+  const t    = buildTotalsFromAds(ads);
+  const prev = prevAds ? buildTotalsFromAds(prevAds) : null;
+  renderKPIsFromTotals(t, prev);
 }
 
-function renderCitySelectorFromAds(ads) {
-  const cities = groupByCity(ads);
-  renderCitySelectorFromList(cities);
+function renderCitySelectorFromAds(ads, prevAds) {
+  const cities     = groupByCity(ads);
+  const prevCities = prevAds ? groupByCity(prevAds) : [];
+  currentPrevCities = prevCities;
+  renderCitySelectorFromList(cities, prevCities);
 }
 
 // ──────────────────────────────────────────────
