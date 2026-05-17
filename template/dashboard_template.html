@@ -1186,7 +1186,8 @@ function applyPeriod() {
   const start = document.getElementById('date-start').value;
   const end   = document.getElementById('date-end').value;
   if (!start || !end) return;
-  const records = HISTORY_DATA.records;
+  const EXCLUDED = ['VAGA'];
+  const records = HISTORY_DATA.records.filter(r => !EXCLUDED.some(ex => (r.name || '').toUpperCase().includes(ex)));
   currentAds = aggregateRecords(records.filter(r => r.date >= start && r.date <= end));
   const prev    = calcPrevPeriod(start, end);
   const prevAds = aggregateRecords(records.filter(r => r.date >= prev.start && r.date <= prev.end));

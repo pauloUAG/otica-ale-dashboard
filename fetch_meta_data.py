@@ -358,6 +358,7 @@ def main():
     print("\nProcessando dados...")
     ads = [process_row(r) for r in raw_rows]
     ads = [a for a in ads if a["spend"] > 0]  # remove zerados
+    ads = [a for a in ads if "VAGA" not in a["name"].upper()]  # exclui criativos de recrutamento
 
     print("\nBuscando links de prévia dos criativos...")
     preview_links = fetch_preview_links([a["ad_id"] for a in ads if a.get("ad_id")])

@@ -173,6 +173,7 @@ def main():
             history_file = json.load(f)
         history_data = history_file
         records = history_file.get("records", [])
+        records = [r for r in records if "VAGA" not in r.get("name", "").upper()]
         period  = history_file.get("period", {})
         ads     = aggregate_records(records)
     else:
@@ -184,7 +185,7 @@ def main():
         print(f"\nFonte: {data_path}")
         with open(data_path, encoding="utf-8") as f:
             weekly_data = json.load(f)
-        ads     = weekly_data["ads"]
+        ads     = [a for a in weekly_data["ads"] if "VAGA" not in a.get("name", "").upper()]
         period  = weekly_data["period"]
         # Tenta carregar histórico também, se existir
         history_path = "data/history.json"
